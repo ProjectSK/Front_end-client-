@@ -1,6 +1,9 @@
 package com.d.utility;
 
+import java.util.List;
+
 import com.d.localdb.*;
+
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -11,9 +14,11 @@ import android.util.Log;
 import android.widget.TextView;
  
 public class ServiceClass extends Service{
-	CollectorMain collector;
-	BatteryInfoCollector bctr;
-	Localdb ldb_usage, ldb_loc, ldb_bat;
+	private CollectorMain collector;
+	private BatteryInfoCollector bctr;
+	private AppUsageCollector auc;
+	private LocationCollector lc;
+	LocalDB ldb_usage, ldb_loc, ldb_bat;
 	Handler handler;
 	
 	long interval = 100;
@@ -57,9 +62,9 @@ public class ServiceClass extends Service{
         Log.d("slog", "onStart()");
         super.onStart(intent, startId);
         
-        collector = new CollectorMain(this);
         bctr = new BatteryInfoCollector();
-        
+        auc = new AppUsageCollector(getBaseContext());
+        lc = new LocationCollector(getBaseContext());
 
  	   
         
@@ -68,10 +73,13 @@ public class ServiceClass extends Service{
 
                @Override
                public void run() {
-            	   Log.d( "slog", "????");
+            	   Log.d( "slog", "ServiceClass is running on AppUsageLog\n");
 
-                   ldb_usage = new Localdb(getBaseContext(), "usage");
-            	   ldb_usage.addElement( collector.GetAppEvents());
+                   ldb_usage = new LocalDB(getBaseContext(),  new AppUsageRecord());
+                   List<AppUsageRecord> records = auc.getUsageRecords();
+                   for(int i = 0; i < records.size(); i++ ){
+                	   ldb_usage.addElement(records.get(i));
+                   }            	   
             	   ldb_usage.close();
             	  
 
@@ -80,20 +88,21 @@ public class ServiceClass extends Service{
                }
            });
         handler = new Handler();
+        
         handler.post(new Runnable(){
 
-               @Override
-               public void run() {
-            	   Log.d( "slog", "????");
+            @Override
+            public void run() {
+         	   Log.d( "slog", "ServiceClass is running on Location log\n");
 
-            	   ldb_loc = new Localdb(getBaseContext(), "loc");
-            	   ldb_loc.addElement( collector.GetLocation());
-            	   ldb_loc.close();           	  
+         	  ldb_loc = new LocalDB(getBaseContext(), new LocationLogRecord());
+                LocationLogRecord records = lc.getLocation();
+                ldb_loc.addElement(records);           	   
+                ldb_loc.close();
+                handler.postDelayed(this, interval); // set time here to refresh
 
-                   handler.postDelayed(this, interval); // set time here to refresh
-
-               }
-           });
+            }
+        });
     }
     
     @Override

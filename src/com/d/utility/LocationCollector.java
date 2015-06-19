@@ -1,7 +1,11 @@
 package com.d.utility;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
+
+import com.d.localdb.LocationLogRecord;
 
 import android.app.AlertDialog;
 import android.app.Service;
@@ -16,9 +20,9 @@ import android.os.IBinder;
 import android.provider.Settings;
 import android.util.Log;
 
-public class LocationCollector extends Service implements LocationListener {
+public class LocationCollector implements LocationListener {
 	private final Context mContext;
-	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("M-d-yyyy HH:mm:ss");
+	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("M-d-yyyy HH:mm:ss.SSS");
 	 
     // flag for GPS status
     boolean isGPSEnabled = false;
@@ -47,9 +51,9 @@ public class LocationCollector extends Service implements LocationListener {
         getLocation();
     }
     
-    public Location getLocation() {
+    public LocationLogRecord getLocation() {
         try {
-            locationManager = (LocationManager) mContext.getSystemService(LOCATION_SERVICE);
+            locationManager = (LocationManager) mContext.getSystemService(Service.LOCATION_SERVICE);
  
             // getting GPS status
             isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -103,8 +107,12 @@ public class LocationCollector extends Service implements LocationListener {
         
         date = dateFormat.format(Calendar.getInstance().getTimeInMillis());
         
- 
-        return location;
+        List<String> elements = new ArrayList<String>();
+        elements.add(date);
+        elements.add(Double.toString(location.getLatitude()));
+        elements.add(Double.toString(location.getLongitude()));
+        
+        return new LocationLogRecord(elements);
     }
     
     /**
@@ -205,9 +213,5 @@ public class LocationCollector extends Service implements LocationListener {
 		
 	}
 
-	@Override
-	public IBinder onBind(Intent arg0) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 }

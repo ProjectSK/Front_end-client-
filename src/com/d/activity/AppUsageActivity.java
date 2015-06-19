@@ -2,7 +2,8 @@ package com.d.activity;
 
 import java.util.List;
 
-import com.d.localdb.Localdb;
+import com.d.localdb.AppUsageRecord;
+import com.d.localdb.LocalDB;
 import com.d.utility.*;
 
 import android.app.Activity;
@@ -20,7 +21,7 @@ import android.widget.TextView;
 
 public class AppUsageActivity extends Activity {
 	// CollectorMain collector;
-	Localdb ldb_usage;
+	LocalDB ldb_usage;
 	private TextView tv;
 	private  Handler handler;
 	private int display_num;
@@ -39,13 +40,15 @@ public class AppUsageActivity extends Activity {
 			@Override
 			public void run() {
 
-				ldb_usage = new Localdb(getBaseContext(), "usage");
-				List<String> elements = ldb_usage.getAlls();
+				ldb_usage = new LocalDB(getBaseContext(), new AppUsageRecord());
+				List<String[]> elements = ldb_usage.getAlls();
 				
 				
 				String output = "";
-				for (int i = elements.size()-1; i >= elements.size() - 100 ; i--) {
-					output += elements.get(i) + "\n";
+				for (int i = elements.size()-1; (i >= elements.size() - 100) && i >= 0 ; i--) {
+					for ( int j = 0 ; j < elements.get(i).length; j++)
+						output += elements.get(i)[j] + " ";
+					output+= "\n";
 				}
 				
 				tv.setText(output);

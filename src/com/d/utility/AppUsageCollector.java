@@ -1,9 +1,12 @@
 package com.d.utility;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Vector;
+
+import com.d.localdb.AppUsageRecord;
 
 import android.annotation.TargetApi;
 import android.app.Service;
@@ -16,17 +19,16 @@ import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
-public class AppUsageCollector extends Service {
+public class AppUsageCollector{
 	private final Context mContext;
 	
 	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("M-d-yyyy HH:mm:ss");
-    public static final String TAG = AppUsageCollector.class.getSimpleName();
+    private static final String TAG = AppUsageCollector.class.getSimpleName();
+	private UsageStatsManager usageStatsManager;
 	
-	UsageStatsManager usageStatsManager;
+	private List<UsageStats> stats;
 	
-	List<UsageStats> stats;
-	
-	Calendar calendar;
+	private Calendar calendar;
 	
 	long currentForegroundStartTime;
 	String currentForegroundPackageName = null;
@@ -48,8 +50,8 @@ public class AppUsageCollector extends Service {
 		startCal.add(Calendar.YEAR, -2);
 		long startTime = calendar.getTimeInMillis();
 		
-		Log.d(TAG, "Range start:" + dateFormat.format(startTime) );
-        Log.d(TAG, "Range end:" + dateFormat.format(endTime));		
+	/*	Log.d(TAG, "Range start:" + dateFormat.format(startTime) );
+        Log.d(TAG, "Range end:" + dateFormat.format(endTime));	*/	
 		
 		stats = usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_YEARLY, startTime, endTime);
 		
@@ -57,58 +59,57 @@ public class AppUsageCollector extends Service {
 		return stats;
 	}
 	
-	public List<String> getUsageEvents()
+	public List<AppUsageRecord> getUsageRecords()
 	{
 		UsageStatsManager usm = (UsageStatsManager) mContext.getSystemService("usagestats");
-		Calendar endCal = Calendar.getInstance();
-		endCal.add(Calendar.DATE, 1);
-		long endTime = endCal.getTimeInMillis();
-		long startTime = calendar.getTimeInMillis();
+				
+		long endTime = System.currentTimeMillis();
+		long startTime = System.currentTimeMillis() - 60*100000;
 		
 		Log.d(TAG, "Range start:" + dateFormat.format(startTime) );
         Log.d(TAG, "Range end:" + dateFormat.format(endTime));
         
-        UsageEvents uEvents = usm.queryEvents(startTime,endTime);
+        UsageEvents osEventsLog = usm.queryEvents(startTime,endTime);
         calendar = Calendar.getInstance();
         
-        List<String> usageEvents = new Vector<String>();
+        List<AppUsageRecord> usageRecords = new Vector<AppUsageRecord>();
         
-        while (uEvents.hasNextEvent()){
-            UsageEvents.Event e = new UsageEvents.Event();
-            uEvents.getNextEvent(e);
+        while (osEventsLog.hasNextEvent()){
+            UsageEvents.Event usageEvent = new UsageEvents.Event();
+            osEventsLog.getNextEvent(usageEvent);
 
-            if (e != null){
-            	if(e.getEventType() == UsageEvents.Event.MOVE_TO_FOREGROUND)
+            if (usageEvent != null){
+            	if(usageEvent.getEventType() == UsageEvents.Event.MOVE_TO_FOREGROUND)
             	{
-            		currentForegroundStartTime = e.getTimeStamp();
-            		currentForegroundPackageName = e.getPackageName();
+            		currentForegroundStartTime = usageEvent.getTimeStamp();
+            		currentForegroundPackageName = usageEvent.getPackageName();
             	}
-            	else if (e.getEventType() == UsageEvents.Event.MOVE_TO_BACKGROUND && currentForegroundPackageName != null)
+            	else if (usageEvent.getEventType() == UsageEvents.Event.MOVE_TO_BACKGROUND && currentForegroundPackageName != null)
             	{
-            		long elapsedTime = e.getTimeStamp() - currentForegroundStartTime;
-            		usageEvents.add("AppUsage:" + currentForegroundPackageName + " started at " + dateFormat.format(currentForegroundStartTime) + ", Active for " + elapsedTime + " milisec.");
+            		long elapsedTime = usageEvent.getTimeStamp() - currentForegroundStartTime;
+            		List<String> recordElements = new ArrayList<String>();
+            		recordElements.add(currentForegroundPackageName);
+            		recordElements.add(Long.toString(currentForegroundStartTime));
+            		recordElements.add(Long.toString(elapsedTime));
+            		           		
+            		usageRecords.add( new AppUsageRecord(recordElements));
             		currentForegroundPackageName = null;
             	}
             	
-            	/*String timestamp = dateFormat.format(e.getTimeStamp());
-            	String eventType = e.getEventType() == UsageEvents.Event.MOVE_TO_FOREGROUND ? "Foreground" : "Background";
-            	usageEvents.add("Event: " + e.getPackageName() + "\t\t" + eventType + "\t\t" +  timestamp);*/
             }
         }
         
         if(currentForegroundPackageName != null)
         {
         	long elapsedTime = Calendar.getInstance().getTimeInMillis() - currentForegroundStartTime;
-    		usageEvents.add("AppUsage:" + currentForegroundPackageName + " started at " + dateFormat.format(currentForegroundStartTime) + " Active for " + elapsedTime + " milisec.");
+        	List<String> recordElements = new ArrayList<String>();
+    		recordElements.add(currentForegroundPackageName);
+    		recordElements.add(Long.toString(currentForegroundStartTime));
+    		recordElements.add(Long.toString(elapsedTime));
+    		           		
+    		usageRecords.add( new AppUsageRecord(recordElements));
         }
         
-        return usageEvents;
+        return usageRecords;
 	}
-
-	@Override
-	public IBinder onBind(Intent intent) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

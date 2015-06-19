@@ -2,7 +2,8 @@ package com.d.activity;
 
 import java.util.List;
 
-import com.d.localdb.Localdb;
+import com.d.localdb.LocalDB;
+import com.d.localdb.LocationLogRecord;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -15,7 +16,7 @@ import android.widget.TextView;
 public class LocationActivity extends Activity {
 
 	// CollectorMain collector;
-		Localdb ldb_loc;
+		LocalDB ldb_loc;
 		private TextView tv;
 		Handler handler;
 
@@ -23,7 +24,7 @@ public class LocationActivity extends Activity {
 		protected void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			setContentView(R.layout.activity_app_usage);
-			ldb_loc = new Localdb(getBaseContext(), "usage");
+			ldb_loc = new LocalDB(getBaseContext(), new LocationLogRecord());
 			tv = new TextView(this);
 			handler = new Handler();
 			String output = "";
@@ -34,11 +35,13 @@ public class LocationActivity extends Activity {
 				@Override
 				public void run() {
 					
-					List<String> elements = ldb_loc.getAlls();
+					List<String[]> elements = ldb_loc.getAlls();
 					
 					String output = "";
-					for (int i = 0; i < elements.size(); i++) {
-						output += elements.get(i) + "\n";
+					for (int i = elements.size()-1; i >= elements.size() - 100 ; i--) {
+						for ( int j = 0 ; j < elements.get(i).length; j++)
+							output += elements.get(i)[j] + " ";
+						output+= "\n";
 					}
 					tv.setText(output);
 					setContentView(tv);

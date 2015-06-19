@@ -52,12 +52,12 @@ public class CollectorMain {
 	{
 		String appUsageMessage = "";
 		
-		List<String> list = appUsageCollector.getUsageEvents();
+	/*	List<String> list = appUsageCollector.getUsageEvents();
 		
 		for (String stats : list)
 		{
 			appUsageMessage = appUsageMessage + stats + "\n";
-		}
+		}*/
 		
 		return appUsageMessage;
 	}

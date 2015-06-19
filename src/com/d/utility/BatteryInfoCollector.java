@@ -28,7 +28,7 @@ public class BatteryInfoCollector {
 	//	this.mIntent = intent;
 		batteryManager = new BatteryManager();
 		goaltime = 60 * 10; 
-		previousTime = System.currentTimeMillis();;
+		previousTime = System.currentTimeMillis();
 		previousRatio = 100 / (goaltime * 60 * 1000);
 		previousState = 100;
 		requestTime = 100;

@@ -14,7 +14,9 @@ import android.widget.TextView;
 import org.json.JSONArray;
 
 import com.d.httpmodule.HttpConnect;
-import com.d.localdb.Localdb;
+import com.d.localdb.AppUsageRecord;
+import com.d.localdb.LocalDB;
+import com.d.localdb.LocationLogRecord;
 import com.d.utility.ServiceClass;
 
 import android.support.v4.app.Fragment;
@@ -34,17 +36,12 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		/*if (savedInstanceState == null) {
-			getSupportFragmentManager().beginTransaction()
-					.add(R.id.container, new PlaceholderFragment()).commit();
-		}*/
 		
 		batteryControllerBotton = (Button)findViewById(R.id.BatteryController);
 		appUsageActivityBotton = (Button)findViewById(R.id.AppUsageActivity);
 		locbtn = (Button)findViewById(R.id.LocationLog);
 		delbtn = (Button)findViewById(R.id.deleteTables);
 		
-	//	w = (Button)findViewById(R.id.button2);
 		
 		Intent serviceIntent = new Intent(MainActivity.this, ServiceClass.class);
         startService(serviceIntent);
@@ -75,11 +72,13 @@ public class MainActivity extends Activity {
 		delbtn.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				Localdb ldb_usage, ldb_loc;
-				 ldb_usage = new Localdb(getBaseContext(), "usage");
-			     ldb_loc = new Localdb(getBaseContext(), "loc");
+				LocalDB ldb_usage, ldb_loc;
+				 ldb_usage = new LocalDB(getBaseContext(), new AppUsageRecord());
+			     ldb_loc = new LocalDB(getBaseContext(), new LocationLogRecord());
 			     ldb_usage.resetTable();
 			     ldb_loc.resetTable();
+			     ldb_loc.close();
+			     ldb_usage.close();
 			}
 		});
 		
@@ -134,49 +133,3 @@ public class MainActivity extends Activity {
 
 }
 
-
-/*
-public class MainActivity extends Activity {
-	CollectorMain collector;
-	
-	Button statsBtn;
-	
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-		
-		if (UStats.getUsageStatsList(this).isEmpty()){
-            Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
-            startActivity(intent);
-        }
-		
-		UStats.printCurrentUsageStatus(MainActivity.this);
-		UStats.getStats(this);
-				
-		TextView tv = new TextView(this);
-		collector = new CollectorMain(MainActivity.this);
-		tv.setText(collector.GetAppUsage() + "\ncurrent location = " + collector.GetLocation() + collector.GetBatteryInfo());
-		setContentView(tv);
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
-}
-*/

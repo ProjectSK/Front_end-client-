@@ -45,7 +45,7 @@
         android:layout_alignLeft="@+id/LocationLog"
         android:layout_alignRight="@+id/LocationLog"
         android:layout_below="@+id/LocationLog"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="34dp"
         android:text="deleteTables" />
 
 </RelativeLayout>
