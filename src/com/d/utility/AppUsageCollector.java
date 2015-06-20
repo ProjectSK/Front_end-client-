@@ -1,23 +1,18 @@
 package com.d.utility;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
-import com.d.localdb.AppUsageRecord;
-
-import android.annotation.TargetApi;
-import android.app.Service;
 import android.app.usage.UsageEvents;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
-import android.content.Intent;
-import android.os.Build;
-import android.os.IBinder;
 import android.util.Log;
+
+import com.d.localdb.AppUsageRecord;
 
 public class AppUsageCollector{
 	private final Context mContext;
@@ -49,9 +44,6 @@ public class AppUsageCollector{
 		long endTime = calendar.getTimeInMillis();
 		startCal.add(Calendar.YEAR, -2);
 		long startTime = calendar.getTimeInMillis();
-		
-	/*	Log.d(TAG, "Range start:" + dateFormat.format(startTime) );
-        Log.d(TAG, "Range end:" + dateFormat.format(endTime));	*/	
 		
 		stats = usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_YEARLY, startTime, endTime);
 		
@@ -87,27 +79,16 @@ public class AppUsageCollector{
             	else if (usageEvent.getEventType() == UsageEvents.Event.MOVE_TO_BACKGROUND && currentForegroundPackageName != null)
             	{
             		long elapsedTime = usageEvent.getTimeStamp() - currentForegroundStartTime;
-            		List<String> recordElements = new ArrayList<String>();
-            		recordElements.add(currentForegroundPackageName);
-            		recordElements.add(Long.toString(currentForegroundStartTime));
-            		recordElements.add(Long.toString(elapsedTime));
-            		           		
-            		usageRecords.add( new AppUsageRecord(recordElements));
+            		usageRecords.add(new AppUsageRecord(currentForegroundPackageName, new Date(currentForegroundStartTime), elapsedTime));
             		currentForegroundPackageName = null;
             	}
-            	
             }
         }
         
         if(currentForegroundPackageName != null)
         {
         	long elapsedTime = Calendar.getInstance().getTimeInMillis() - currentForegroundStartTime;
-        	List<String> recordElements = new ArrayList<String>();
-    		recordElements.add(currentForegroundPackageName);
-    		recordElements.add(Long.toString(currentForegroundStartTime));
-    		recordElements.add(Long.toString(elapsedTime));
-    		           		
-    		usageRecords.add( new AppUsageRecord(recordElements));
+    		usageRecords.add(new AppUsageRecord(currentForegroundPackageName, new Date(currentForegroundStartTime), elapsedTime));
         }
         
         return usageRecords;

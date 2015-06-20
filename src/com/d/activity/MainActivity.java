@@ -73,12 +73,12 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				LocalDB ldb_usage, ldb_loc;
-				 ldb_usage = new LocalDB(getBaseContext(), new AppUsageRecord());
-			     ldb_loc = new LocalDB(getBaseContext(), new LocationLogRecord());
-			     ldb_usage.resetTable();
-			     ldb_loc.resetTable();
-			     ldb_loc.close();
-			     ldb_usage.close();
+				ldb_usage = new LocalDB(getBaseContext(), AppUsageRecord.TABLE);
+			    ldb_loc = new LocalDB(getBaseContext(), LocationLogRecord.TABLE);
+			    ldb_usage.resetTable();
+			    ldb_loc.resetTable();
+			    ldb_loc.close();
+			    ldb_usage.close();
 			}
 		});
 		

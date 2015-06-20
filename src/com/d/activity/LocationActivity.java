@@ -1,5 +1,6 @@
 package com.d.activity;
 
+import java.util.Calendar;
 import java.util.List;
 
 import com.d.localdb.LocalDB;
@@ -24,34 +25,38 @@ public class LocationActivity extends Activity {
 		protected void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			setContentView(R.layout.activity_app_usage);
-			ldb_loc = new LocalDB(getBaseContext(), new LocationLogRecord());
+			ldb_loc = new LocalDB(getBaseContext(), LocationLogRecord.TABLE);
 			tv = new TextView(this);
+            tv.setMovementMethod(new ScrollingMovementMethod());
 			handler = new Handler();
 			String output = "";
 			tv.setText(output);
 			setContentView(tv);
 			handler.post(new Runnable() {
-
 				@Override
 				public void run() {
-					
-					List<String[]> elements = ldb_loc.getAlls();
+				    Calendar stcal = Calendar.getInstance();
+				    stcal.add(Calendar.SECOND, -20);
+				    Calendar edcal = Calendar.getInstance();
+				    edcal.add(Calendar.SECOND, -5);
+
+					List<LocationLogRecord> elements = ldb_loc.getAll(null, stcal.getTime(), edcal.getTime(), true, 100);
 					
 					String output = "";
-					for (int i = elements.size()-1; i >= elements.size() - 100 ; i--) {
-						for ( int j = 0 ; j < elements.get(i).length; j++)
-							output += elements.get(i)[j] + " ";
-						output+= "\n";
+					for (LocationLogRecord record : elements) {
+					    output += record.time;
+					    output += " ";
+					    output += record.latitude;
+					    output += " ";
+					    output += record.longtitude;
+					    output += "\n";
 					}
 					tv.setText(output);
-					setContentView(tv);
-					tv.setMovementMethod(new ScrollingMovementMethod());
+					tv.invalidate();
 
 					handler.postDelayed(this, 500); // set time here to refresh
-
 				}
 			});
-
 		}
 
 		@Override

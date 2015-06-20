@@ -35,28 +35,28 @@ public class AppUsageActivity extends Activity {
 		String output = "";
 		tv.setText(output);
 		setContentView(tv);
+        tv.setMovementMethod(new ScrollingMovementMethod());
+
+        ldb_usage = new LocalDB(getBaseContext(), AppUsageRecord.TABLE);
 		handler.post(new Runnable() {
 
 			@Override
 			public void run() {
-
-				ldb_usage = new LocalDB(getBaseContext(), new AppUsageRecord());
-				List<String[]> elements = ldb_usage.getAlls();
-				
+                List<AppUsageRecord> elements = ldb_usage.getAll(null, null, null, true, 100);
 				
 				String output = "";
-				for (int i = elements.size()-1; (i >= elements.size() - 100) && i >= 0 ; i--) {
-					for ( int j = 0 ; j < elements.get(i).length; j++)
-						output += elements.get(i)[j] + " ";
+				for (AppUsageRecord record : elements) {
+				    output += record.packageName;
+				    output += " ";
+				    output += record.startTime;
+				    output += " ";
+				    output += record.elapsedTime;
 					output+= "\n";
 				}
-				
 				tv.setText(output);
-				setContentView(tv);
-				tv.setMovementMethod(new ScrollingMovementMethod());
+				tv.invalidate();
 
 				handler.postDelayed(this, 500); // set time here to refresh
-
 			}
 		});
 

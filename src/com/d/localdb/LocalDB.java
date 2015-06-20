@@ -1,12 +1,15 @@
 package com.d.localdb;
 
-import java.util.LinkedList;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Vector;
+import java.util.Locale;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -19,255 +22,303 @@ public class LocalDB extends SQLiteOpenHelper {
 	private static final int DATABASE_VERSION = 1;
 	// Database Name
 	private static String DATABASE_NAME = "SK_Planet_SNU_TeamD";
-	private String DATABASE_TABLE;
-	private String[] COLUMN_NAMES;
-	private Integer[] PRIMARY_KEYS;
+	
+	public final SQLVTable sqlvtable;
 
+    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 	/*
 	 * Parameters: context to use to open or create the database table name of
 	 * the database file column names of the database file primary keys of the
 	 * database file. they refer the indexes of column names starting form 0.
 	 */
-	public LocalDB(Context context, Record record) {
+	public LocalDB(Context context, SQLVTable sqlvtable) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
-		DATABASE_TABLE = new String(record.getTableName());
-		COLUMN_NAMES = new String[record.getColumnNames().size()];
-		PRIMARY_KEYS = new Integer[record.getPrimaryKeyIndexes().size()];
-		record.getColumnNames().toArray(COLUMN_NAMES);
-		record.getPrimaryKeyIndexes().toArray(PRIMARY_KEYS);
-		
-		
+	    this.sqlvtable = sqlvtable;
 	}
 
-	private String create_table_query(){
-		String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + DATABASE_TABLE
-				+ " ( ";
-		String PRIMARY_KEY_CLAUSE = "";
-		int j = 0;
-		for (int i = 0; i < COLUMN_NAMES.length; i++) {
-			CREATE_TABLE += COLUMN_NAMES[i] + " TEXT";
+	private void createTable(SQLiteDatabase db) {
 
-			if (j < PRIMARY_KEYS.length) {
-				if (PRIMARY_KEYS[j].equals(i)) {
-					if (j != 0) {
-						PRIMARY_KEY_CLAUSE += ", ";
-					}
-					PRIMARY_KEY_CLAUSE += COLUMN_NAMES[i];
-					j++;
-				}
-			}
-			if (i != COLUMN_NAMES.length - 1)
-				CREATE_TABLE += ", ";
-		}
-
-		if (PRIMARY_KEYS.length != 0) {
-			CREATE_TABLE += " , PRIMARY KEY ( " + PRIMARY_KEY_CLAUSE + " )";
-
-		}
-
-		CREATE_TABLE += " )";
-		return CREATE_TABLE;
+		String sql = sqlvtable.generateCreateTable();
+	    Log.d("createTable", "created table with " + sql);
+        db.execSQL(sql);
 	}
+
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		// SQL statement to create record table
-		String CREATE_TABLE = create_table_query();
-
-		// create table
-		db.execSQL(CREATE_TABLE);
+	    createTable(db);
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		// Drop older table if existed
-		db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE);
-
+		db.execSQL("DROP TABLE IF EXISTS " + sqlvtable.name);
 		// create fresh table
-		this.onCreate(db);
+		createTable(db);
 	}
 
 	// ---------------------------------------------------------------------
 	public void resetTable() {
 		SQLiteDatabase db = this.getWritableDatabase();
-		db.execSQL("DELETE FROM " + DATABASE_TABLE);
-		db.close();
+		try {
+            db.execSQL("DELETE FROM " + sqlvtable.name);
+		} catch (SQLException e){
+		    e.printStackTrace();
+		} finally {
+            db.close();
+		}
+	}
+	
+	
+	public ContentValues getContentValues(Record record) {
+		ContentValues values = new ContentValues();
+		for (SQLVColumn col : sqlvtable.columns) {
+		    values.put(col.name, col.fromRecord(record));
+		}
+		return values;
+	}
+	
+	private String getPrimaryKeyWhereClause(Record record) {
+	    return getPrimaryKeyWhereClause(record, null);
 	}
 
-	public void addElement(Record record) {
-		Log.d("add element", record.toString());
-		// 1. get reference to writable DB
+	private String getPrimaryKeyWhereClause(Record record, String additional) {
+	    StringBuffer buffer = new StringBuffer();
+        boolean isFirst = true;
+        if (record != null) {
+            for (SQLVColumn col : sqlvtable.getPrimaryKeys()) {
+                if (col.fieldIsNull(record)) {
+                    continue;
+                }
+                if (!isFirst)
+                    buffer.append(" AND ");
+                else
+                    isFirst = false;
+                buffer.append(col.name);
+                buffer.append(" LIKE ");
+                buffer.append("?");
+            }
+        }
+        if (additional != null) {
+            if (!isFirst)
+                buffer.append(" AND ");
+            else
+                isFirst = false;
+            buffer.append(additional);
+        }
+        return buffer.toString();
+	}
+
+	private String[] getPrimaryKeyWhereArgs(Record record, String [] additional) {
+	    ArrayList<String> args = new ArrayList<String>();
+	    if (record != null) {
+            List<SQLVColumn> primaryKeys = sqlvtable.getPrimaryKeys();
+            for (SQLVColumn col : primaryKeys) {
+                if (!col.fieldIsNull(record))
+                    args.add(col.fromRecord(record));
+            }
+	    }
+        if (additional != null) {
+            for (String ad : additional) {
+                args.add(ad);
+            }
+        }
+        
+        String[] result = new String[args.size()];
+        result = args.toArray(result);
+        return result;
+	}
+	private String[] getPrimaryKeyWhereArgs(Record record) {
+	    return getPrimaryKeyWhereArgs(record, null);
+	}
+
+	private void setRecordByCursor(Record record, Cursor cursor) {
+        for (int idx = 0; idx < cursor.getColumnCount(); idx++) {
+            String s = cursor.getString(idx);
+            sqlvtable.columns[idx].toRecord(record, s);
+        }
+	}
+	
+	public boolean addRecord(Record record) {
+	    return addRecord(record, true);
+	}
+
+	public boolean addRecord(Record record, boolean upsert) {
+		Log.d("add element", record.toString() + " to " + sqlvtable.name);
 		SQLiteDatabase db = this.getWritableDatabase();
 
-		// 2. create ContentValues to add key "column"/value
-		ContentValues values = new ContentValues();
-		List<String> elements = record.getElements();
-		List<String> columns = record.getColumnNames();
-		for (int i = 0; i < columns.size(); i++) {
-			values.put(columns.get(i), elements.get(i)); // get title
+		try {
+            ContentValues values = getContentValues(record);
+
+            RETRY: do {
+                try {
+                    long flag = db.insertOrThrow(sqlvtable.name, // table
+                            null, // nullColumnHack
+                            values); 
+                    return flag != -1;
+                }
+                catch (SQLiteConstraintException c) {
+                    /*
+                     * handle the insertion error if it resulted from the primary key
+                     * constraint and upsert is true
+                     */
+                    if (upsert) {
+                        db.update(sqlvtable.name, values, getPrimaryKeyWhereClause(record), getPrimaryKeyWhereArgs(record));
+                    } else
+                        return false;
+                } catch (SQLiteException s) {
+                    if (s.getMessage().contains("no such table")) {
+                        createTable(db);
+                        onCreate(db);
+                        continue RETRY;
+                    } else
+                        throw s;
+                } 
+            } while (false);
+		} finally {
+            db.close();
 		}
-
-		long flag;
-		// 3. insert
-		do {
-			try {
-				flag = db.insertOrThrow(DATABASE_TABLE, // table
-						null, // nullColumnHack
-						values); // key/value -> keys = column names/ values =
-									// column values
-				break;
-			}
-			/*
-			 * handle the insert error if it resulted from the primary key
-			 * constraint.
-			 */
-			catch (SQLiteConstraintException c) {
-				String whereClause = "";
-				for (int i = 0; i < PRIMARY_KEYS.length; i++) {
-					if (i != 0)
-						whereClause += " AND ";
-					int index = PRIMARY_KEYS[i];
-					whereClause += COLUMN_NAMES[index] + " LIKE "
-							+ elements.get(index);
-				}
-				db.update(DATABASE_TABLE, values, whereClause, null);
-			}
-			/*
-			 * handle no such table
-			 */
-			catch (SQLiteException s) {
-				if (s.getMessage().contains("no such table")) {
-					onCreate(db);
-				}
-			} catch (Exception e) {
-				System.out.println(e.getMessage());
-			}
-		} while (true);
-
-		// 4. close
-		db.close();
+		return true;
 	}
-
-	public List<String> getElement(List<String> primaryKeys) {
-
+	
+	public <T extends Record> T getRecord(T recordWithPrimaryKey) {
 		// 1. get reference to readable DB
 		SQLiteDatabase db = this.getReadableDatabase();
 
-		// 1.5. set where clause
-		String whereClause = "";
-		for (int i = 0; i < PRIMARY_KEYS.length; i++) {
-			if (i != 0)
-				whereClause += " AND ";
-			int index = PRIMARY_KEYS[i];
-			whereClause += COLUMN_NAMES[index] + " LIKE " + primaryKeys.get(i);
+		try {
+            // 2. build query
+            Cursor cursor = db.query(sqlvtable.name, // a. table
+                    sqlvtable.getColumnNameArray(), // b. column names
+                    getPrimaryKeyWhereClause(recordWithPrimaryKey), // c. selections
+                    getPrimaryKeyWhereArgs(recordWithPrimaryKey), // d. selections args
+                    null, // e. group by
+                    null, // f. having
+                    null, // g. order by
+                    null); // h. limit
+
+            // 3. if we got results get the first one
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+                    setRecordByCursor(recordWithPrimaryKey, cursor);
+                    return recordWithPrimaryKey;
+                } else
+                    return null;
+            } else
+                return null;
+		} finally {
+		    db.close();
 		}
-
-		// 2. build query
-		Cursor cursor = db.query(DATABASE_TABLE, // a. table
-				COLUMN_NAMES, // b. column names
-				whereClause, // c. selections
-				null, // d. selections args
-				null, // e. group by
-				null, // f. having
-				null, // g. order by
-				null); // h. limit
-
-		// 3. if we got results get the first one
-		if (cursor != null)
-			cursor.moveToFirst();
-
-		// 4. build object
-		List<String> element = new Vector<String>();
-
-		for (int i = 0; i < cursor.getColumnCount(); i++)
-			element.add(cursor.getString(i));
-
-		Log.d("get ", element.toString());
-
-		// 5. return record
-		return element;
 	}
 
-	// Get All records
-	public List<String[]> getAlls() {
-		List<String[]> elements = new LinkedList<String[]>();
-
-		// 2. get reference to Writable DB
-		SQLiteDatabase db = this.getWritableDatabase();
-		onCreate(db);
-		Cursor cursor = db.rawQuery("SELECT * FROM " + DATABASE_TABLE, null);
-		Log.d("getAll()", DATABASE_TABLE);
-		// 3. go over each row, build record and add it to list
-
-		while (cursor.moveToNext()) {
-			String element[] = new String[cursor.getColumnCount()];
-			for (int i = 0; i < cursor.getColumnCount(); i++)
-				element[i] = cursor.getString(i);
-
-			// Add record to records
-			elements.add(element);
+	public int getCount() {
+		SQLiteDatabase db = this.getReadableDatabase();
+		try {
+		    Cursor cursor = db.rawQuery("SELECT count(*) FROM " + sqlvtable.name, null);
+		    if (cursor == null)
+		        return 0;
+		    if (cursor.moveToFirst()) {
+		        return cursor.getInt(0);
+		    } else
+		        return 0;
+		} finally {
+		    db.close();
 		}
+	}
+	
+	
+	/**
+	 * when either 'from' or 'until' specified, SQLVTable associated to this LocalDB should be of type of SQLVDatedTable
+	 * 
+	 * (from, until]
+	 * 
+	 */
+	@SuppressWarnings({ "unchecked" })
+    public <T extends Record> List<T> getAll(T critiaRecord, Date from, Date until, boolean desc, Integer limit) {
 
-		// return records
-		return elements;
+	    String additionalWhereClause = null;
+	    String [] additionalArgs = null;
+	    
+	    String orderBy = null;
+	    String limitStr = limit == null? null : limit.toString();
+	    if (sqlvtable instanceof SQLVDatedTable) {
+            SQLVDatedTable datedTable = (SQLVDatedTable)sqlvtable;
+            SQLVColumn dateColumn = datedTable.getDateColumn();
+            orderBy = dateColumn.name + (desc?" DESC":" ASC");
+	    }
+
+	    if (from != null || until != null) {
+            SQLVDatedTable datedTable = (SQLVDatedTable)sqlvtable;
+            SQLVColumn dateColumn = datedTable.getDateColumn();
+
+            additionalWhereClause = "";
+            additionalArgs = new String[(from != null && until != null)? 2 : 1];
+            int argIdx = 0;
+
+            boolean isFirst = true;
+            if (from != null) {
+                isFirst = false;
+                additionalWhereClause += dateColumn.name + " > datetime(?)";
+                additionalArgs[argIdx++] = dateFormat.format(from);
+            }
+            if (until != null) {
+                if (!isFirst)
+                    additionalWhereClause += " AND ";
+                additionalWhereClause += dateColumn.name + " <= datetime(?)";
+                additionalArgs[argIdx++] = dateFormat.format(until);
+            }
+	    }
+	    String whereStr = getPrimaryKeyWhereClause(critiaRecord, additionalWhereClause);
+	    String [] whereArgs = getPrimaryKeyWhereArgs(critiaRecord, additionalArgs);
+	    String d = "[";
+	    for  (String a : whereArgs) {
+	        d += a;
+	        d += ", ";
+	    }
+	    d += "]";
+		Log.d("getAll", "getAll: " + whereStr + " and " + d);
+	    
+	    if (whereArgs.length == 0) {
+	        whereStr = null;
+	        whereArgs = null;
+	    }
+	    
+		SQLiteDatabase db = this.getReadableDatabase();
+		ArrayList<Record> result = new ArrayList<Record>();
+		try {
+            Cursor cursor = db.query(sqlvtable.name, sqlvtable.getColumnNameArray(), whereStr, whereArgs, null, null, orderBy, limitStr);
+            while (cursor.moveToNext()) {
+                Record newRecord = sqlvtable.recordFactory.newRecord();
+                setRecordByCursor(newRecord, cursor);
+                result.add(newRecord);
+            }
+		} finally {
+		    db.close();
+		}
+		return (List<T>)result;
 	}
 
 	// Updating single record
-	public int updateElement(Record record) {
-
+	public boolean updateElement(Record record) {
 		// 1. get reference to writable DB
 		SQLiteDatabase db = this.getWritableDatabase();
-
-		// 2. create ContentValues to add key "column"/value
-		ContentValues values = new ContentValues();
-		List<String> elements = record.getElements();
-		List<String> columns = record.getColumnNames();
-		for (int i = 0; i < columns.size(); i++) {
-			values.put(columns.get(i), elements.get(i)); // get title
+		try {
+            int i;
+            i = db.update(sqlvtable.name, // table
+                    getContentValues(record), 
+                    getPrimaryKeyWhereClause(record), // selections
+                    getPrimaryKeyWhereArgs(record)); // selection args
+            return i != -1;
+		} finally {
+            db.close();
 		}
-
-		// 3. updating row
-		String whereClause = "";
-		for (int i = 0; i < PRIMARY_KEYS.length; i++) {
-			if (i != 0)
-				whereClause += " AND ";
-			int index = PRIMARY_KEYS[i];
-			whereClause += COLUMN_NAMES[index] + " LIKE " + elements.get(index);
-		}
-
-		int i = db.update(DATABASE_TABLE, // table
-				values, // column/value
-				whereClause, // selections
-				null); // selection args
-
-		// 4. close
-		db.close();
-
-		return i;
-
 	}
 
-	// Deleting single record
-	public void deleteElement(List<String> primaryKeys) {
-
+	public int deleteElement(Record record) {
 		// 1. get reference to writable DB
 		SQLiteDatabase db = this.getWritableDatabase();
-
-		// 1.5. set where clause
-		String whereClause = "";
-		for (int i = 0; i < PRIMARY_KEYS.length; i++) {
-			if (i != 0)
-				whereClause += " AND ";
-			int index = PRIMARY_KEYS[i];
-			whereClause += COLUMN_NAMES[index] + " LIKE " + primaryKeys.get(i);
+		try {
+		    return db.delete(sqlvtable.name, getPrimaryKeyWhereClause(record), getPrimaryKeyWhereArgs(record));
+		} finally {
+            db.close();
 		}
-
-		// 2. delete
-		db.delete(DATABASE_TABLE, whereClause, null);
-
-		// 3. close
-		db.close();
-
-		Log.d("delet", whereClause);
-
 	}
 }

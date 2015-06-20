@@ -14,14 +14,15 @@ import android.util.Log;
 import android.widget.TextView;
  
 public class ServiceClass extends Service{
-	private CollectorMain collector;
 	private BatteryInfoCollector bctr;
 	private AppUsageCollector auc;
 	private LocationCollector lc;
+	
 	LocalDB ldb_usage, ldb_loc, ldb_bat;
 	Handler handler;
 	
-	long interval = 100;
+    // DEBUG
+	long interval = 4000;
     
     @Override
     public IBinder onBind(Intent intent) {
@@ -54,6 +55,8 @@ public class ServiceClass extends Service{
 				bctr.update(intent);
 				interval = bctr.batteryCalculator();
 			}
+			// DEBUG
+			interval = 4000;
 		}
 	};
      
@@ -74,17 +77,13 @@ public class ServiceClass extends Service{
                @Override
                public void run() {
             	   Log.d( "slog", "ServiceClass is running on AppUsageLog\n");
-
-                   ldb_usage = new LocalDB(getBaseContext(),  new AppUsageRecord());
+                   ldb_usage = new LocalDB(getBaseContext(), AppUsageRecord.TABLE);
                    List<AppUsageRecord> records = auc.getUsageRecords();
-                   for(int i = 0; i < records.size(); i++ ){
-                	   ldb_usage.addElement(records.get(i));
-                   }            	   
+                   for (AppUsageRecord record : records) { 
+                	   ldb_usage.addRecord(record);
+                   }
             	   ldb_usage.close();
-            	  
-
                    handler.postDelayed(this, interval); // set time here to refresh
-
                }
            });
         handler = new Handler();
@@ -95,9 +94,9 @@ public class ServiceClass extends Service{
             public void run() {
          	   Log.d( "slog", "ServiceClass is running on Location log\n");
 
-         	  ldb_loc = new LocalDB(getBaseContext(), new LocationLogRecord());
-                LocationLogRecord records = lc.getLocation();
-                ldb_loc.addElement(records);           	   
+         	  ldb_loc = new LocalDB(getBaseContext(), LocationLogRecord.TABLE);
+                LocationLogRecord record = lc.getLocation();
+                ldb_loc.addRecord(record);           	   
                 ldb_loc.close();
                 handler.postDelayed(this, interval); // set time here to refresh
 

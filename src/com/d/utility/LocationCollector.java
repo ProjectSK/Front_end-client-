@@ -3,6 +3,7 @@ package com.d.utility;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import com.d.localdb.LocationLogRecord;
@@ -35,7 +36,6 @@ public class LocationCollector implements LocationListener {
     Location location; // location
     double latitude; // latitude
     double longitude; // longitude
-    String date; 
  
     // The minimum distance to change Updates in meters
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; // 10 meters
@@ -104,15 +104,7 @@ public class LocationCollector implements LocationListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
-        date = dateFormat.format(Calendar.getInstance().getTimeInMillis());
-        
-        List<String> elements = new ArrayList<String>();
-        elements.add(date);
-        elements.add(Double.toString(location.getLatitude()));
-        elements.add(Double.toString(location.getLongitude()));
-        
-        return new LocationLogRecord(elements);
+        return new LocationLogRecord(Calendar.getInstance().getTime(), (float)(location.getLatitude()), (float)(location.getLongitude()));
     }
     
     /**
