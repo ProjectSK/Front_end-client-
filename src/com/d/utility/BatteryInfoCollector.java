@@ -1,6 +1,13 @@
 package com.d.utility;
 
+import java.util.Calendar;
+
+import com.d.localdb.BatteryRecord;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.BatteryManager;
 
 public class BatteryInfoCollector {
@@ -10,18 +17,43 @@ public class BatteryInfoCollector {
 	
 	long capacity;
 	
-	int level;
-	int scale;
-	int voltage;
+	long level;
+	long scale;
+	long voltage;
 	float temperature;
 	
 	/*
 	 * 분단위, 목표 시간에 맞추어 배터리 최적화
 	 */
-	int goaltime;
+	long goaltime;
 	String technology;
 	String healthType;
 	String plugType;
+	
+	
+	private BroadcastReceiver bcr = new BroadcastReceiver() {
+		int count = 0;
+
+		public void onReceive(Context context, Intent intent) {
+			String action = intent.getAction();
+			count++;
+			if (action.equals(Intent.ACTION_BATTERY_CHANGED)) {
+				update(intent);
+			}
+			if (action.equals(Intent.ACTION_BATTERY_LOW)) {
+				update(intent);
+			}
+			if (action.equals(Intent.ACTION_BATTERY_OKAY)) {
+				update(intent);
+			}
+			if (action.equals(Intent.ACTION_POWER_CONNECTED)) {
+				update(intent);
+			}
+			if (action.equals(Intent.ACTION_POWER_DISCONNECTED)) {
+				update(intent);
+			}
+		}
+	};
 	
 	public BatteryInfoCollector()
 	{
@@ -55,6 +87,10 @@ public class BatteryInfoCollector {
 	private double previousRatio;
 	private long previousState ;
 	private long requestTime ;
+	
+	public BatteryRecord getRecord(){
+		return new BatteryRecord(Calendar.getInstance().getTime(), capacity, level, scale, voltage, temperature, healthType, plugType);
+	}
 	
 	public long batteryCalculator(){
 		/* 수정요망 */

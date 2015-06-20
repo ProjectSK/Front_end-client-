@@ -204,7 +204,11 @@ public class LocalDB extends SQLiteOpenHelper {
                     return null;
             } else
                 return null;
-		} finally {
+		}catch (SQLException e){
+			createTable(db);
+			return null;
+		} 
+		finally {
 		    db.close();
 		}
 	}
@@ -219,7 +223,11 @@ public class LocalDB extends SQLiteOpenHelper {
 		        return cursor.getInt(0);
 		    } else
 		        return 0;
-		} finally {
+		}catch (SQLException e){
+			createTable(db);
+			return 0;
+		} 
+		finally {
 		    db.close();
 		}
 	}
@@ -290,7 +298,11 @@ public class LocalDB extends SQLiteOpenHelper {
                 setRecordByCursor(newRecord, cursor);
                 result.add(newRecord);
             }
+		} catch (SQLException e){
+			createTable(db);
+			return new ArrayList<T>();
 		} finally {
+		
 		    db.close();
 		}
 		return (List<T>)result;
@@ -317,7 +329,11 @@ public class LocalDB extends SQLiteOpenHelper {
 		SQLiteDatabase db = this.getWritableDatabase();
 		try {
 		    return db.delete(sqlvtable.name, getPrimaryKeyWhereClause(record), getPrimaryKeyWhereArgs(record));
-		} finally {
+		}catch (SQLException e){
+			createTable(db);
+			return 0;
+		} 
+		finally {
             db.close();
 		}
 	}
