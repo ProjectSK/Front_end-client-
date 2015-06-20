@@ -1,6 +1,9 @@
 package com.d.activity;
 
+import android.Manifest.permission;
 import android.app.Activity;
+import android.app.AppOpsManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -31,6 +34,16 @@ public class MainActivity extends Activity {
 
 	Button batteryControllerBotton, appUsageActivityBotton,locbtn, delbtn;
 	
+	void permission_check(){
+		Context context = getBaseContext();
+		AppOpsManager appOps = (AppOpsManager) context
+		        .getSystemService(Context.APP_OPS_SERVICE);
+		boolean granted = appOps.checkOpNoThrow("android:get_usage_stats", 
+		        android.os.Process.myUid(), context.getPackageName()) == AppOpsManager.MODE_ALLOWED;
+		 Log.d("permission_check", "android:get_usage_stats() : " + granted);
+	}
+	
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -42,6 +55,7 @@ public class MainActivity extends Activity {
 		locbtn = (Button)findViewById(R.id.LocationLog);
 		delbtn = (Button)findViewById(R.id.deleteTables);
 		
+		permission_check();
 		
 		Intent serviceIntent = new Intent(MainActivity.this, ServiceClass.class);
         startService(serviceIntent);

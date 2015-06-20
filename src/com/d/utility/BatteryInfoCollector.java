@@ -31,7 +31,7 @@ public class BatteryInfoCollector {
 		previousTime = System.currentTimeMillis();
 		previousRatio = 100 / (goaltime * 60 * 1000);
 		previousState = 100;
-		requestTime = 100;
+		requestTime = 1000;
 	}
 	private boolean isGoalInRightRange(int goaltime){
 		return 0 <= goaltime;
@@ -44,7 +44,7 @@ public class BatteryInfoCollector {
 		previousTime = System.currentTimeMillis();;
 		previousRatio = 100 / (goaltime * 60 * 1000);
 		previousState = 100;
-		requestTime = 100;
+		requestTime = 1000;
 		if( isGoalInRightRange(_goaltime)){
 			goaltime = _goaltime;
 		}
@@ -82,7 +82,7 @@ public class BatteryInfoCollector {
 		/*
 		 * 최소치 보정
 		 */
-		requestTime = (requestTime < 100)? 100 : requestTime;
+		requestTime = (requestTime < 1000)? 1000 : requestTime;
 		// 최대치 보정
 		requestTime = (requestTime > 60000)? 5000 : requestTime; 
 		

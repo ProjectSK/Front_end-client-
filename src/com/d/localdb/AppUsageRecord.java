@@ -34,7 +34,7 @@ public class AppUsageRecord implements Record {
 	
     @Override
     public String toString() {
-        return String.format(Locale.getDefault(), "[packageName=%s, startTime=%s, elapsedTime=%ld]",  packageName, startTime, elapsedTime);
+        return "[packageName="+packageName+", startTime="+startTime+", elapsedTime="+elapsedTime+"]";
     }
 	
 }
