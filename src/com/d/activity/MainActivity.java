@@ -1,20 +1,21 @@
 package com.d.activity;
 
-import android.Manifest.permission;
+import org.json.JSONArray;
+
 import android.app.Activity;
 import android.app.AppOpsManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.Settings;
+import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
-
-import org.json.JSONArray;
 
 import com.d.httpmodule.HttpConnect;
 import com.d.localdb.AppUsageRecord;
@@ -22,18 +23,10 @@ import com.d.localdb.LocalDB;
 import com.d.localdb.LocationLogRecord;
 import com.d.utility.ServiceClass;
 
-import android.support.v4.app.Fragment;
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.*;
-import android.view.View.*;
-import android.widget.Button;
-import android.os.Build;
-
 public class MainActivity extends Activity {
 
 	Button batteryControllerBotton, appUsageActivityBotton,locbtn, delbtn;
-	
+	Button myWebViewBtn; 
 	void permission_check(){
 		Context context = getBaseContext();
 		AppOpsManager appOps = (AppOpsManager) context
@@ -54,6 +47,8 @@ public class MainActivity extends Activity {
 		appUsageActivityBotton = (Button)findViewById(R.id.AppUsageActivity);
 		locbtn = (Button)findViewById(R.id.LocationLog);
 		delbtn = (Button)findViewById(R.id.deleteTables);
+		
+		myWebViewBtn = (Button)findViewById(R.id.myWebViewBtn);
 		
 		permission_check();
 		
@@ -95,7 +90,13 @@ public class MainActivity extends Activity {
 			    ldb_usage.close();
 			}
 		});
-		
+		myWebViewBtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), MyWebActivity.class);
+                startActivity(intent);
+            }
+        });
 	}
 
 	@Override

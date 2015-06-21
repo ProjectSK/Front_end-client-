@@ -48,4 +48,14 @@
         android:layout_marginTop="34dp"
         android:text="deleteTables" />
 
+    <Button
+        android:id="@+id/myWebViewBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/deleteTables"
+        android:layout_alignRight="@+id/deleteTables"
+        android:layout_below="@+id/deleteTables"
+        android:layout_marginTop="18dp"
+        android:text="WebView" />
+
 </RelativeLayout>

@@ -2,22 +2,16 @@ package com.d.activity;
 
 import java.util.List;
 
-import com.d.localdb.AppUsageRecord;
-import com.d.localdb.LocalDB;
-import com.d.utility.*;
-
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.Settings;
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
+
+import com.d.localdb.AppUsageRecord;
+import com.d.localdb.LocalDB;
 
 public class AppUsageActivity extends Activity {
 	// CollectorMain collector;
