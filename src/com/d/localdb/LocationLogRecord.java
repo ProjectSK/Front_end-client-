@@ -13,18 +13,18 @@ public class LocationLogRecord implements Record {
                     new ReflVColumn(LocationLogRecord.class, "longtitude", ColumnType.Float, false)
         });
 
+    public Float latitude;
+
+    public Float longtitude;
+
+    public Date time;
     public LocationLogRecord() {
     }
-
     public LocationLogRecord(Date time, Float latitude, Float longtitude) {
         this.time = time;
         this.latitude = latitude;
         this.longtitude = longtitude;
     }
-
-    public Date time;
-    public Float latitude;
-    public Float longtitude;
 
     @Override
     public SQLVTable getTable() {

@@ -25,16 +25,24 @@ import com.d.utility.ServiceClass;
 
 public class MainActivity extends Activity {
 
-	Button batteryControllerBotton, appUsageActivityBotton,locbtn, delbtn;
-	Button myWebViewBtn; 
-	void permission_check(){
-		Context context = getBaseContext();
-		AppOpsManager appOps = (AppOpsManager) context
-		        .getSystemService(Context.APP_OPS_SERVICE);
-		boolean granted = appOps.checkOpNoThrow("android:get_usage_stats", 
-		        android.os.Process.myUid(), context.getPackageName()) == AppOpsManager.MODE_ALLOWED;
-		 Log.d("permission_check", "android:get_usage_stats() : " + granted);
+	/**
+	 * A placeholder fragment containing a simple view.
+	 */
+	public static class PlaceholderFragment extends Fragment {
+
+		public PlaceholderFragment() {
+		}
+
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container,
+				Bundle savedInstanceState) {
+			View rootView = inflater.inflate(R.layout.fragment_main, container,
+					false);
+			return rootView;
+		}
 	}
+	Button batteryControllerBotton, appUsageActivityBotton,locbtn, delbtn; 
+	Button myWebViewBtn;
 	
 	
 	@Override
@@ -107,6 +115,13 @@ public class MainActivity extends Activity {
 		return true;
 	}
 
+	public void onDestroy() {   
+	    super.onDestroy();
+	    Intent serviceIntent = new Intent(MainActivity.this, ServiceClass.class);
+        stopService(serviceIntent);
+	    
+	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle action bar item clicks here. The action bar will
@@ -118,32 +133,17 @@ public class MainActivity extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-
-	/**
-	 * A placeholder fragment containing a simple view.
-	 */
-	public static class PlaceholderFragment extends Fragment {
-
-		public PlaceholderFragment() {
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_main, container,
-					false);
-			return rootView;
-		}
+	void permission_check(){
+		Context context = getBaseContext();
+		AppOpsManager appOps = (AppOpsManager) context
+		        .getSystemService(Context.APP_OPS_SERVICE);
+		boolean granted = appOps.checkOpNoThrow("android:get_usage_stats", 
+		        android.os.Process.myUid(), context.getPackageName()) == AppOpsManager.MODE_ALLOWED;
+		 Log.d("permission_check", "android:get_usage_stats() : " + granted);
 	}
 	private String sendData(JSONArray data){
 		HttpConnect connect = new HttpConnect("52.11.1.59:3180/send",data);
 		return connect.connect();
-	}
-	public void onDestroy() {   
-	    super.onDestroy();
-	    Intent serviceIntent = new Intent(MainActivity.this, ServiceClass.class);
-        stopService(serviceIntent);
-	    
 	}
 
 }

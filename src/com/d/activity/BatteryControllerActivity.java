@@ -1,7 +1,5 @@
 package com.d.activity;
 
-import com.d.utility.*;
-
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -9,21 +7,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentFilter.MalformedMimeTypeException;
-import android.nfc.NfcAdapter;
 import android.nfc.tech.NfcF;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.widget.TextView;
 
+import com.d.utility.BatteryInfoCollector;
+
 public class BatteryControllerActivity extends Activity {
 	
-	BatteryInfoCollector bctr;
-
-	private PendingIntent mPendingIntent;
-	private IntentFilter[] mFilters;
-	private String[][] mTechLists;
-	private TextView tv;
-
 	private BroadcastReceiver bcr = new BroadcastReceiver() {
 		int count = 0;
 
@@ -48,17 +40,12 @@ public class BatteryControllerActivity extends Activity {
 		}
 	};
 
-	@Override
-	public void onResume() {
-		super.onResume();
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(Intent.ACTION_BATTERY_CHANGED);
-		filter.addAction(Intent.ACTION_BATTERY_LOW);
-		filter.addAction(Intent.ACTION_BATTERY_OKAY);
-		filter.addAction(Intent.ACTION_POWER_CONNECTED);
-		filter.addAction(Intent.ACTION_POWER_DISCONNECTED);
-		registerReceiver(bcr, filter);
-	}
+	BatteryInfoCollector bctr;
+	private IntentFilter[] mFilters;
+	private PendingIntent mPendingIntent;
+	private String[][] mTechLists;
+
+	private TextView tv;
 
 	public void onBatteryChanged(Intent intent) {
 		int plug, status, scale, level, ratio;
@@ -75,10 +62,7 @@ public class BatteryControllerActivity extends Activity {
 		
 
 	}
-	
-	
-	
-	
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -117,6 +101,21 @@ public class BatteryControllerActivity extends Activity {
 			String action = passedIntent.getAction();			
 		}
 		
+	}
+	
+	
+	
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(Intent.ACTION_BATTERY_CHANGED);
+		filter.addAction(Intent.ACTION_BATTERY_LOW);
+		filter.addAction(Intent.ACTION_BATTERY_OKAY);
+		filter.addAction(Intent.ACTION_POWER_CONNECTED);
+		filter.addAction(Intent.ACTION_POWER_DISCONNECTED);
+		registerReceiver(bcr, filter);
 	}
 
 }

@@ -5,9 +5,9 @@ import java.util.List;
 
 
 public class SQLVTable {
-    public final RecordFactory recordFactory;
-    public final String name;
     public final SQLVColumn [] columns;
+    public final String name;
+    public final RecordFactory recordFactory;
     
     public SQLVTable(RecordFactory recordFactory, String name, SQLVColumn[] columns) {
         super();
@@ -17,16 +17,6 @@ public class SQLVTable {
         for (SQLVColumn col : columns) {
             col.setTable(this);
         }
-    }
-    
-    public List<SQLVColumn> getPrimaryKeys() {
-        ArrayList<SQLVColumn> result = new ArrayList<SQLVColumn>();
-        for (SQLVColumn col : columns) {
-            if (col.isPrimaryKey) {
-                result.add(col);
-            }
-        }
-        return result;
     }
     
     public String generateCreateTable() {
@@ -68,6 +58,16 @@ public class SQLVTable {
         int idx = 0;
         for (SQLVColumn col : columns) {
             result[idx++] = col.name;
+        }
+        return result;
+    }
+    
+    public List<SQLVColumn> getPrimaryKeys() {
+        ArrayList<SQLVColumn> result = new ArrayList<SQLVColumn>();
+        for (SQLVColumn col : columns) {
+            if (col.isPrimaryKey) {
+                result.add(col);
+            }
         }
         return result;
     }

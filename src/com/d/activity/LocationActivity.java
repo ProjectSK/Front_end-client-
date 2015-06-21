@@ -4,12 +4,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import android.R.color;
 import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SeekBar;
@@ -21,63 +19,18 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 public class LocationActivity extends Activity {
-		private LocalDB ldb_loc;
-
-		private GoogleMap googleMap;
-		private SeekBar resolutionSeekBar;
-		
-		private Handler mHandler;
-		
 		public static enum Interval {
-		    ThirtyMin, ThreeHour, OneDay
-		}
-		
-		public static final int N_INTERVALS = 60;
-		Interval curInterval = Interval.ThirtyMin;
-		
-		private static Calendar delCalender(Calendar calender, Interval itv) {
-		    calender = (Calendar)calender.clone();
-		    switch (itv) {
-		    case OneDay:
-		        calender.add(Calendar.MINUTE, -1440 / N_INTERVALS);
-		        break;
-		    case ThreeHour:
-		        calender.add(Calendar.MINUTE, -180 / N_INTERVALS);
-		        break;
-		    case ThirtyMin:
-		        // DEBUG
-		        calender.add(Calendar.SECOND, -180 / N_INTERVALS);
-		        break;
-		    }
-		    return calender;
-		}
-		private static Interval progressToInterval(int progress) {
-		    switch (progress) {
-		    case 0:
-		        return Interval.OneDay;
-		    case 1:
-		        return Interval.ThreeHour;
-		    case 2:
-		        return Interval.ThirtyMin;
-		    }
-		    return null;
+		    OneDay, ThirtyMin, ThreeHour
 		}
 
-
-		
 		public class MapCtrl {
-		    public void invalidate() {
-		        googleMap.clear();
-		    }
 		    boolean isFirst = true;
-
 		    public void draw(boolean move) {
 		        Calendar curCalender = Calendar.getInstance();
 		        Calendar prevCalendar = delCalender(Calendar.getInstance(), curInterval);
@@ -132,9 +85,53 @@ public class LocationActivity extends Activity {
 		            }
 		        }
 		    }
+
+		    public void invalidate() {
+		        googleMap.clear();
+		    }
+		}
+		public static final int N_INTERVALS = 60;
+		
+		private static Calendar delCalender(Calendar calender, Interval itv) {
+		    calender = (Calendar)calender.clone();
+		    switch (itv) {
+		    case OneDay:
+		        calender.add(Calendar.MINUTE, -1440 / N_INTERVALS);
+		        break;
+		    case ThreeHour:
+		        calender.add(Calendar.MINUTE, -180 / N_INTERVALS);
+		        break;
+		    case ThirtyMin:
+		        // DEBUG
+		        calender.add(Calendar.SECOND, -180 / N_INTERVALS);
+		        break;
+		    }
+		    return calender;
 		}
 		
+		private static Interval progressToInterval(int progress) {
+		    switch (progress) {
+		    case 0:
+		        return Interval.OneDay;
+		    case 1:
+		        return Interval.ThreeHour;
+		    case 2:
+		        return Interval.ThirtyMin;
+		    }
+		    return null;
+		}
+		
+		Interval curInterval = Interval.ThirtyMin;
+		private GoogleMap googleMap;
+		
+		private LocalDB ldb_loc;
 		MapCtrl mapCtrl = new MapCtrl();
+
+
+		
+		private Handler mHandler;
+		
+		private SeekBar resolutionSeekBar;
 		
 
 
@@ -145,14 +142,6 @@ public class LocationActivity extends Activity {
 			resolutionSeekBar = (SeekBar)findViewById(R.id.seekBar_resolution);
 			resolutionSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
                 @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
-                }
-                
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-                }
-                
-                @Override
                 public void onProgressChanged(SeekBar seekBar, int progress,
                         boolean fromUser) {
                     Interval newInterval = progressToInterval(progress);
@@ -160,6 +149,14 @@ public class LocationActivity extends Activity {
                         return;
                     mapCtrl.invalidate();
                     mapCtrl.draw(true);
+                }
+                
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+                }
+                
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
                 }
             });
 
@@ -184,16 +181,16 @@ public class LocationActivity extends Activity {
 		
 
 		@Override
-		public void onDestroy() {
-			super.onDestroy();
-			mHandler.removeMessages(0);
-		}
-
-		@Override
 		public boolean onCreateOptionsMenu(Menu menu) {
 			// Inflate the menu; this adds items to the action bar if it is present.
 			getMenuInflater().inflate(R.menu.main, menu);
 			return true;
+		}
+
+		@Override
+		public void onDestroy() {
+			super.onDestroy();
+			mHandler.removeMessages(0);
 		}
 
 		@Override

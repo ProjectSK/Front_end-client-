@@ -2,8 +2,6 @@ package com.d.utility;
 
 import java.util.List;
 
-import com.d.localdb.*;
-
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -13,24 +11,18 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.d.localdb.AppUsageRecord;
+import com.d.localdb.BatteryRecord;
+import com.d.localdb.LocalDB;
+import com.d.localdb.LocationLogRecord;
+import com.d.localdb.MemoryRecord;
+
 public class ServiceClass extends Service {
 
-	private BatteryInfoCollector bctr;
 	private AppUsageCollector auc;
-	private LocationCollector lc;
-	private MemoryUsageCollector muc;
-
-	LocalDB ldb_usage, ldb_loc, ldb_bat, ldb_mem;
-	Handler handler;
-
-	// DEBUG
-	long interval = 1000;
-
-	@Override
-	public IBinder onBind(Intent intent) {
-		return null;
-	}
-
+	/**
+	 * 배터리의 변화라는 event에 반응하여 battery 정보를 업데이트하는 receiver.
+	 */
 	private BroadcastReceiver bcr = new BroadcastReceiver() {
 		int count = 0;
 
@@ -60,7 +52,43 @@ public class ServiceClass extends Service {
 			
 		}
 	};
+	private BatteryInfoCollector bctr;
+	private Handler handler;
 
+	// DEBUG
+	private long interval = 1000;
+	private LocationCollector lc;
+
+	private LocalDB ldb_usage, ldb_loc, ldb_bat, ldb_mem;
+
+	private MemoryUsageCollector muc;
+
+	/* (non-Javadoc)
+	 * @see android.app.Service#onBind(android.content.Intent)
+	 */
+	@Override
+	public IBinder onBind(Intent intent) {
+		return null;
+	}
+
+	/**
+	 * @see android.app.Service#onDestroy()
+	 * 추가적으로 OnstartCommand에서 생성된 handler를 종료한다.
+	 * background service를 종료하기 원한다면 반드시 호출해야한다.
+	 */
+	@Override
+	public void onDestroy() {
+		Log.d("slog", "onDestroy()");
+		super.onDestroy();
+
+		handler.removeMessages(0);
+	}
+
+	/**
+	 * 내부에서 handler를 호출하여 데이터 수집을 위한 background service가 작동한다.
+	 * background service를 종료하기 위해서는 본 class의 onDestroy()를 호출해야한다.
+	 * @see android.app.Service#onStartCommand(android.content.Intent, int, int)
+	 */
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		super.onStartCommand(intent, flags, startId);
@@ -129,13 +157,5 @@ public class ServiceClass extends Service {
 	
 		return START_NOT_STICKY;
 
-	}
-
-	@Override
-	public void onDestroy() {
-		Log.d("slog", "onDestroy()");
-		super.onDestroy();
-
-		handler.removeMessages(0);
 	}
 }

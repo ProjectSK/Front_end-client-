@@ -2,27 +2,27 @@ package com.d.localdb;
 
 public abstract class SQLVColumn {
     public static enum ColumnType {
-        String, Long, Datetime, Float
+        Datetime, Float, Long, String
     }
 
+    public final boolean isPrimaryKey;
+
+    public final String name;
+    
+    protected SQLVTable table;
+
+    public final ColumnType type;
     public SQLVColumn(String name, ColumnType type, boolean isPrimaryKey) {
         this.name = name;
         this.type = type;
         this.isPrimaryKey = isPrimaryKey;
     }
-
+    public abstract boolean fieldIsNull(Record record);
+    
+    public abstract String fromRecord(Record record);
     public void setTable(SQLVTable table) {
         this.table = table;
     }
-    
-    protected SQLVTable table;
-
-    public final String name;
-    public final ColumnType type;
-    public final boolean isPrimaryKey;
-    
-    public abstract boolean fieldIsNull(Record record);
-    public abstract String fromRecord(Record record);
     public abstract boolean toRecord(Record record, String value);
     
     

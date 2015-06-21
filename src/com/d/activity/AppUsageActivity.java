@@ -16,12 +16,13 @@ import com.d.localdb.AppUsageRecord;
 import com.d.localdb.LocalDB;
 
 public class AppUsageActivity extends Activity {
+	private static SimpleDateFormat dateFormat = new SimpleDateFormat(
+			"HH:mm:ss", Locale.getDefault());
+	private int display_num;
+	private Handler handler;
 	// CollectorMain collector;
 	LocalDB ldb_usage;
 	private TextView tv;
-	private  Handler handler;
-	private int display_num;
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -32,25 +33,26 @@ public class AppUsageActivity extends Activity {
 		String output = "";
 		tv.setText(output);
 		setContentView(tv);
-        tv.setMovementMethod(new ScrollingMovementMethod());
+		tv.setMovementMethod(new ScrollingMovementMethod());
 
-        ldb_usage = new LocalDB(getBaseContext(), AppUsageRecord.TABLE);
+		ldb_usage = new LocalDB(getBaseContext(), AppUsageRecord.TABLE);
 		handler.post(new Runnable() {
 
 			@Override
 			public void run() {
-                List<AppUsageRecord> elements = ldb_usage.getAll(null, null, null, true, 100);
-				
+				List<AppUsageRecord> elements = ldb_usage.getAll(null, null,
+						null, true, 100);
+
 				String output = "";
 				for (AppUsageRecord record : elements) {
-				    output += record.packageName;
-				    output += ", ";
-				    output += dateFormat.format(record.startTime);
-				    output += ", ";
-				    output += record.elapsedTime;
-					output+= "\n";
-					
-				//	Log.d("print",output);
+					output += record.packageName;
+					output += ", ";
+					output += dateFormat.format(record.startTime);
+					output += ", ";
+					output += record.elapsedTime;
+					output += "\n";
+
+					// Log.d("print",output);
 				}
 				tv.setText(output);
 				tv.invalidate();
@@ -62,17 +64,17 @@ public class AppUsageActivity extends Activity {
 	}
 
 	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		handler.removeMessages(0);
-
-	}
-
-	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		handler.removeMessages(0);
+
 	}
 
 	@Override

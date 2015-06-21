@@ -1,25 +1,22 @@
 package com.d.httpmodule;
 
-import org.apache.http.*;
+import java.io.IOException;
+
+import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.util.*;
-
 public class HttpConnect {
-	String url;
 	JSONArray postdata;
+	String url;
 
 	public HttpConnect(String url, JSONArray data) {
 		this.url = url;
