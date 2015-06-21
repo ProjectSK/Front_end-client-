@@ -1,7 +1,5 @@
 package com.d.activity;
 
-import com.d.utility.*;
-
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -9,11 +7,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentFilter.MalformedMimeTypeException;
-import android.nfc.NfcAdapter;
 import android.nfc.tech.NfcF;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.widget.TextView;
+
+import com.d.utility.BatteryInfoCollector;
 
 public class BatteryControllerActivity extends Activity {
 	
