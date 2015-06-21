@@ -1,6 +1,8 @@
 package com.d.activity;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -19,6 +21,7 @@ public class AppUsageActivity extends Activity {
 	private TextView tv;
 	private  Handler handler;
 	private int display_num;
+    private static SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -41,11 +44,13 @@ public class AppUsageActivity extends Activity {
 				String output = "";
 				for (AppUsageRecord record : elements) {
 				    output += record.packageName;
-				    output += " ";
-				    output += record.startTime;
-				    output += " ";
+				    output += ", ";
+				    output += dateFormat.format(record.startTime);
+				    output += ", ";
 				    output += record.elapsedTime;
 					output+= "\n";
+					
+				//	Log.d("print",output);
 				}
 				tv.setText(output);
 				tv.invalidate();

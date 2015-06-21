@@ -104,7 +104,9 @@ public class LocationCollector implements LocationListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return new LocationLogRecord(Calendar.getInstance().getTime(), (float)(location.getLatitude()), (float)(location.getLongitude()));
+        if(location!=null)
+        	return new LocationLogRecord(Calendar.getInstance().getTime(), (float)(location.getLatitude()), (float)(location.getLongitude()));
+        return null;
     }
     
     /**
