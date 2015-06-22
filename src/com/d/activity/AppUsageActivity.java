@@ -1,30 +1,28 @@
 package com.d.activity;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.os.Handler;
+import android.text.method.ScrollingMovementMethod;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.d.localdb.AppUsageRecord;
 import com.d.localdb.LocalDB;
-import com.d.utility.*;
-
-import android.app.Activity;
-import android.content.Intent;
-import android.os.Bundle;
-import android.os.Handler;
-import android.provider.Settings;
-import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 
 public class AppUsageActivity extends Activity {
+	private static SimpleDateFormat dateFormat = new SimpleDateFormat(
+			"HH:mm:ss", Locale.getDefault());
+	private int display_num;
+	private Handler handler;
 	// CollectorMain collector;
 	LocalDB ldb_usage;
 	private TextView tv;
-	private  Handler handler;
-	private int display_num;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -35,37 +33,33 @@ public class AppUsageActivity extends Activity {
 		String output = "";
 		tv.setText(output);
 		setContentView(tv);
+		tv.setMovementMethod(new ScrollingMovementMethod());
+
+		ldb_usage = new LocalDB(getBaseContext(), AppUsageRecord.TABLE);
 		handler.post(new Runnable() {
 
 			@Override
 			public void run() {
+				List<AppUsageRecord> elements = ldb_usage.getAll(null, null,
+						null, true, 100);
 
-				ldb_usage = new LocalDB(getBaseContext(), new AppUsageRecord());
-				List<String[]> elements = ldb_usage.getAlls();
-				
-				
 				String output = "";
-				for (int i = elements.size()-1; (i >= elements.size() - 100) && i >= 0 ; i--) {
-					for ( int j = 0 ; j < elements.get(i).length; j++)
-						output += elements.get(i)[j] + " ";
-					output+= "\n";
+				for (AppUsageRecord record : elements) {
+					output += record.packageName;
+					output += ", ";
+					output += dateFormat.format(record.startTime);
+					output += ", ";
+					output += record.elapsedTime;
+					output += "\n";
+
+					// Log.d("print",output);
 				}
-				
 				tv.setText(output);
-				setContentView(tv);
-				tv.setMovementMethod(new ScrollingMovementMethod());
+				tv.invalidate();
 
 				handler.postDelayed(this, 500); // set time here to refresh
-
 			}
 		});
-
-	}
-
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		handler.removeMessages(0);
 
 	}
 
@@ -74,6 +68,13 @@ public class AppUsageActivity extends Activity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		handler.removeMessages(0);
+
 	}
 
 	@Override

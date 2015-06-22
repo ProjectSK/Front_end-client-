@@ -1,53 +1,38 @@
 package com.d.localdb;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
+import java.util.Locale;
 
-public class LocationLogRecord implements Record{
-	private String[] columnNames =  {"time", "latitude", "longitude"} ;
-	private Integer[] primaryKeyIndexes = {0};
-	private List<String> elements;
-	public static String tableName = "loc";
-	
-	public LocationLogRecord(List<String> elements){
-		
-		this.elements = new ArrayList<String>();		
-		for(int i = 0 ; i < columnNames.length; i++){
-			this.elements.add(elements.get(i));
-		}
-	}
-	public LocationLogRecord(){		
-		this.elements = new ArrayList<String>();		
-		for(int i = 0 ; i < columnNames.length; i++){
-			this.elements.add("");
-		}
-	}
-	public List<Integer> getPrimaryKeyIndexes(){
-		List<Integer> indexes = new ArrayList<Integer>();		
-		for(int i = 0 ; i < primaryKeyIndexes.length; i++){
-			indexes.add(new Integer(primaryKeyIndexes[i]));
-		}
-		return indexes;
-		
-	}
-	public List<String> getElements() {
-		return elements;
-	}
-	public void setElements(List<String> elements) {
-		this.elements = new ArrayList<String>();		
-		for(int i = 0 ; i < columnNames.length; i++){
-			this.elements.add(elements.get(i));
-		}
-	}
-	public List<String> getColumnNames() {
-		List<String> names = new ArrayList<String>();		
-		for(int i = 0 ; i < columnNames.length; i++){
-			names.add(new String(columnNames[i]));
-		}
-		return names;
-	}	
-	public String getTableName(){
-		return tableName;
-	}
+import com.d.localdb.SQLVColumn.ColumnType;
 
+public class LocationLogRecord implements Record {
+    public static SQLVTable TABLE = new SQLVDatedTable(RecordFactory.reflection(LocationLogRecord.class), "location", "time",
+                new SQLVColumn [] {
+                    new ReflVColumn(LocationLogRecord.class, "time", ColumnType.Datetime, true),
+                    new ReflVColumn(LocationLogRecord.class, "latitude", ColumnType.Float, false),
+                    new ReflVColumn(LocationLogRecord.class, "longtitude", ColumnType.Float, false)
+        });
+
+    public Float latitude;
+
+    public Float longtitude;
+
+    public Date time;
+    public LocationLogRecord() {
+    }
+    public LocationLogRecord(Date time, Float latitude, Float longtitude) {
+        this.time = time;
+        this.latitude = latitude;
+        this.longtitude = longtitude;
+    }
+
+    @Override
+    public SQLVTable getTable() {
+        return TABLE;
+    }
+    
+    @Override
+    public String toString() {
+        return String.format(Locale.getDefault(), "[time=%s, latitude=%.2f, longitude=%.2f]", time.toString(), latitude, longtitude);
+    }
 }

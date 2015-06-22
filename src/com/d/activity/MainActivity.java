@@ -1,51 +1,77 @@
 package com.d.activity;
 
+import org.json.JSONArray;
+
 import android.app.Activity;
+import android.app.AppOpsManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.Settings;
+import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
-
-import org.json.JSONArray;
 
 import com.d.httpmodule.HttpConnect;
 import com.d.localdb.AppUsageRecord;
 import com.d.localdb.LocalDB;
 import com.d.localdb.LocationLogRecord;
+import com.d.utility.AlarmReceiver;
+import com.d.utility.SenderService;
 import com.d.utility.ServiceClass;
-
-import android.support.v4.app.Fragment;
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.*;
-import android.view.View.*;
-import android.widget.Button;
-import android.os.Build;
 
 public class MainActivity extends Activity {
 
-	Button batteryControllerBotton, appUsageActivityBotton,locbtn, delbtn;
+	/**
+	 * A placeholder fragment containing a simple view.
+	 */
+	public static class PlaceholderFragment extends Fragment {
+
+		public PlaceholderFragment() {
+		}
+
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container,
+				Bundle savedInstanceState) {
+			View rootView = inflater.inflate(R.layout.fragment_main, container,
+					false);
+			return rootView;
+		}
+	}
+	Button batteryControllerBotton, appUsageActivityBotton,locbtn, stopbtn,membtn; 
+	
+	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
 
 		
 		batteryControllerBotton = (Button)findViewById(R.id.BatteryController);
 		appUsageActivityBotton = (Button)findViewById(R.id.AppUsageActivity);
 		locbtn = (Button)findViewById(R.id.LocationLog);
-		delbtn = (Button)findViewById(R.id.deleteTables);
+		membtn = (Button)findViewById(R.id.membtn);
+		stopbtn = (Button)findViewById(R.id.deleteTables);
 		
+		
+		
+		permission_check();
 		
 		Intent serviceIntent = new Intent(MainActivity.this, ServiceClass.class);
         startService(serviceIntent);
+
+        serviceIntent = new Intent(MainActivity.this, SenderService.class);
+        startService(serviceIntent);
+
         Log.d("main", "onStart()");
+        
 		
 		
 		batteryControllerBotton.setOnClickListener(new OnClickListener(){
@@ -69,16 +95,20 @@ public class MainActivity extends Activity {
 				startActivity(intent);
 			}
 		});
-		delbtn.setOnClickListener(new OnClickListener(){
+		membtn.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				LocalDB ldb_usage, ldb_loc;
-				 ldb_usage = new LocalDB(getBaseContext(), new AppUsageRecord());
-			     ldb_loc = new LocalDB(getBaseContext(), new LocationLogRecord());
-			     ldb_usage.resetTable();
-			     ldb_loc.resetTable();
-			     ldb_loc.close();
-			     ldb_usage.close();
+				Intent intent = new Intent(getBaseContext(), MemoryActivity.class);
+				startActivity(intent);
+			}
+		});
+		stopbtn.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				 Intent serviceIntent = new Intent(MainActivity.this, ServiceClass.class);
+			     stopService(serviceIntent);
+			     onDestroy();
+			     System.exit(0);
 			}
 		});
 		
@@ -92,6 +122,12 @@ public class MainActivity extends Activity {
 		return true;
 	}
 
+	public void onDestroy() {   
+	    super.onDestroy();
+	   
+	    
+	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle action bar item clicks here. The action bar will
@@ -103,32 +139,17 @@ public class MainActivity extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-
-	/**
-	 * A placeholder fragment containing a simple view.
-	 */
-	public static class PlaceholderFragment extends Fragment {
-
-		public PlaceholderFragment() {
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_main, container,
-					false);
-			return rootView;
-		}
+	void permission_check(){
+		Context context = getBaseContext();
+		AppOpsManager appOps = (AppOpsManager) context
+		        .getSystemService(Context.APP_OPS_SERVICE);
+		boolean granted = appOps.checkOpNoThrow("android:get_usage_stats", 
+		        android.os.Process.myUid(), context.getPackageName()) == AppOpsManager.MODE_ALLOWED;
+		 Log.d("permission_check", "android:get_usage_stats() : " + granted);
 	}
 	private String sendData(JSONArray data){
 		HttpConnect connect = new HttpConnect("52.11.1.59:3180/send",data);
 		return connect.connect();
-	}
-	public void onDestroy() {   
-	    super.onDestroy();
-	    Intent serviceIntent = new Intent(MainActivity.this, ServiceClass.class);
-        stopService(serviceIntent);
-	    
 	}
 
 }

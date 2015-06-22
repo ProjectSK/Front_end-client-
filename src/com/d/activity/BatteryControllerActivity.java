@@ -1,6 +1,7 @@
 package com.d.activity;
 
-import com.d.utility.*;
+import java.io.IOException;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.PendingIntent;
@@ -9,114 +10,98 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentFilter.MalformedMimeTypeException;
-import android.nfc.NfcAdapter;
 import android.nfc.tech.NfcF;
 import android.os.BatteryManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
+import android.view.ViewGroup.LayoutParams;
+import android.webkit.WebView;
+import android.widget.TabHost;
+import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 
-public class BatteryControllerActivity extends Activity {
-	
+import com.d.localdb.AppUsageRecord;
+import com.d.localdb.BatteryRecord;
+import com.d.localdb.LocalDB;
+import com.d.utility.BatteryInfoCollector;
+
+public class BatteryControllerActivity extends MyWebActivity {
+
 	BatteryInfoCollector bctr;
-
-	private PendingIntent mPendingIntent;
-	private IntentFilter[] mFilters;
-	private String[][] mTechLists;
 	private TextView tv;
-
-	private BroadcastReceiver bcr = new BroadcastReceiver() {
-		int count = 0;
-
-		public void onReceive(Context context, Intent intent) {
-			String action = intent.getAction();
-			count++;
-			if (action.equals(Intent.ACTION_BATTERY_CHANGED)) {
-				onBatteryChanged(intent);
-			}
-			if (action.equals(Intent.ACTION_BATTERY_LOW)) {
-				bctr.update(intent);
-			}
-			if (action.equals(Intent.ACTION_BATTERY_OKAY)) {
-				bctr.update(intent);
-			}
-			if (action.equals(Intent.ACTION_POWER_CONNECTED)) {
-				bctr.update(intent);
-			}
-			if (action.equals(Intent.ACTION_POWER_DISCONNECTED)) {
-				bctr.update(intent);
-			}
-		}
-	};
-
-	@Override
-	public void onResume() {
-		super.onResume();
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(Intent.ACTION_BATTERY_CHANGED);
-		filter.addAction(Intent.ACTION_BATTERY_LOW);
-		filter.addAction(Intent.ACTION_BATTERY_OKAY);
-		filter.addAction(Intent.ACTION_POWER_CONNECTED);
-		filter.addAction(Intent.ACTION_POWER_DISCONNECTED);
-		registerReceiver(bcr, filter);
-	}
-
-	public void onBatteryChanged(Intent intent) {
-		int plug, status, scale, level, ratio;
-		String sPlug = "";
-		String sStatus = "";
-
-		if (intent.getBooleanExtra(BatteryManager.EXTRA_PRESENT, false) == false) {
-			// sStatus.setText("no battery");
-			return;
-		}
-		bctr.update(intent);
-		tv.setText(bctr.toString()+"\n");
-		setContentView(tv);
-		
-
-	}
+	private Handler handler;
 	
-	
-	
-	
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_battery);
-		if (savedInstanceState == null) {
-			//TODO something
-		}
-		tv = new TextView(this);
+		ldb = new LocalDB(getBaseContext(), BatteryRecord.TABLE);
+		yaxisName = "Battery (%)";
 		
-		bctr = new BatteryInfoCollector();
-		Intent targetIntent = new Intent(this, BatteryInfoCollector.class);		
-		targetIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-		mPendingIntent = PendingIntent.getActivity(this, 0, targetIntent, 0);
+		handler = new Handler();
+		ldb = new LocalDB(getBaseContext(), BatteryRecord.TABLE);
 		
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(Intent.ACTION_BATTERY_CHANGED);
-		filter.addAction(Intent.ACTION_BATTERY_LOW);
-		filter.addAction(Intent.ACTION_BATTERY_OKAY);
-		filter.addAction(Intent.ACTION_POWER_CONNECTED);
-		filter.addAction(Intent.ACTION_POWER_DISCONNECTED);
-		registerReceiver(bcr, filter);
+		TabHost tabhost = (TabHost) findViewById(android.R.id.tabhost);
+	    tabhost.setup();
+	    TabSpec ts = tabhost.newTabSpec("tag1"); 
+	    ts.setContent(R.id.graph);
+	    ts.setIndicator("Capacity graph");
+	    tabhost.addTab(ts);
+
+	    ts = tabhost.newTabSpec("tag2"); 
+	    ts.setContent(R.id.present);
+	    ts.setIndicator("Present state");  
+	    tabhost.addTab(ts);
 		
+		tv = (TextView) findViewById(R.id.text);
+		webview =  (WebView) findViewById(R.id.webview);
+	
 		try {
-			filter.addDataType("*/*");
-		} catch (MalformedMimeTypeException e) {
-			throw new RuntimeException("fail", e);
+			webview.loadDataWithBaseURL("file:///android_asset/",
+					getAssetAsString("html/area.html"),
+					"text/html; charset=utf-8", null, null);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-
-		mFilters = new IntentFilter[] { filter, };
-
-		mTechLists = new String[][] { new String[] { NfcF.class.getName() } };
-
-		Intent passedIntent = getIntent();
-		if (passedIntent != null) {
-			String action = passedIntent.getAction();			
-		}
+		webview.getSettings().setJavaScriptEnabled(true);
+		webview.getSettings().setDomStorageEnabled(true);
+		webview.getSettings().setLoadWithOverviewMode(true);
+		webview.addJavascriptInterface(new JSInterface(), "Android");
 		
+
+		handler.post(new Runnable() {
+
+			@Override
+			public void run() {
+				List<BatteryRecord> elements = ldb.getAll(null, null, null, true, 1);
+
+				String output = "";
+				for (BatteryRecord record : elements) {
+					output = record.toString() + "\n";
+
+					Log.d("print", output);
+				}
+				tv.setText(output);
+				//setContentView(tv);
+				//setContentView(webview);
+				tv.invalidate();
+
+				handler.postDelayed(this, 500); // set time here to refresh
+			}
+		});
+
+		// setContentView(tv);
+
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		handler.removeMessages(0);
+		ldb.close();
 	}
 
 }
