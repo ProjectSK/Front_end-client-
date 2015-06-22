@@ -41,7 +41,6 @@ public class LocalDB extends SQLiteOpenHelper {
 	}
 
 	public boolean addRecord(Record record, boolean upsert) {
-		Log.d("add element", record.toString() + " to " + sqlvtable.name);
 		SQLiteDatabase db = this.getWritableDatabase();
 
 		try {
@@ -165,7 +164,7 @@ public class LocalDB extends SQLiteOpenHelper {
                 setRecordByCursor(newRecord, cursor);
                 result.add(newRecord);
             }
-		} catch (SQLException e){
+		} catch (SQLException e) {
 			createTable(db);
 			return new ArrayList<T>();
 		} finally {

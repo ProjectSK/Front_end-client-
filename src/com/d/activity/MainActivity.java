@@ -41,8 +41,8 @@ public class MainActivity extends Activity {
 			return rootView;
 		}
 	}
-	Button batteryControllerBotton, appUsageActivityBotton,locbtn, delbtn; 
-	Button myWebViewBtn;
+	Button batteryControllerBotton, appUsageActivityBotton,locbtn, stopbtn,membtn; 
+	
 	
 	
 	@Override
@@ -54,9 +54,10 @@ public class MainActivity extends Activity {
 		batteryControllerBotton = (Button)findViewById(R.id.BatteryController);
 		appUsageActivityBotton = (Button)findViewById(R.id.AppUsageActivity);
 		locbtn = (Button)findViewById(R.id.LocationLog);
-		delbtn = (Button)findViewById(R.id.deleteTables);
+		membtn = (Button)findViewById(R.id.membtn);
+		stopbtn = (Button)findViewById(R.id.deleteTables);
 		
-		myWebViewBtn = (Button)findViewById(R.id.myWebViewBtn);
+		
 		
 		permission_check();
 		
@@ -86,25 +87,23 @@ public class MainActivity extends Activity {
 				startActivity(intent);
 			}
 		});
-		delbtn.setOnClickListener(new OnClickListener(){
+		membtn.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				LocalDB ldb_usage, ldb_loc;
-				ldb_usage = new LocalDB(getBaseContext(), AppUsageRecord.TABLE);
-			    ldb_loc = new LocalDB(getBaseContext(), LocationLogRecord.TABLE);
-			    ldb_usage.resetTable();
-			    ldb_loc.resetTable();
-			    ldb_loc.close();
-			    ldb_usage.close();
+				Intent intent = new Intent(getBaseContext(), MemoryActivity.class);
+				startActivity(intent);
 			}
 		});
-		myWebViewBtn.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), MyWebActivity.class);
-                startActivity(intent);
-            }
-        });
+		stopbtn.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				 Intent serviceIntent = new Intent(MainActivity.this, ServiceClass.class);
+			     stopService(serviceIntent);
+			     onDestroy();
+			     System.exit(0);
+			}
+		});
+		
 	}
 
 	@Override
@@ -117,8 +116,7 @@ public class MainActivity extends Activity {
 
 	public void onDestroy() {   
 	    super.onDestroy();
-	    Intent serviceIntent = new Intent(MainActivity.this, ServiceClass.class);
-        stopService(serviceIntent);
+	   
 	    
 	}
 

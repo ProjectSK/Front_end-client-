@@ -1,34 +1,31 @@
 package com.d.activity;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
-import android.app.Activity;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.IntentFilter.MalformedMimeTypeException;
-import android.nfc.tech.NfcF;
-import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.view.ViewGroup.LayoutParams;
 import android.webkit.WebView;
 import android.widget.TabHost;
-import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
+import android.widget.TabHost.TabSpec;
 
-import com.d.localdb.AppUsageRecord;
+import com.d.activity.MyWebActivity.GraphRow;
+import com.d.activity.MyWebActivity.Information;
+import com.d.activity.MyWebActivity.JSInterface;
 import com.d.localdb.BatteryRecord;
 import com.d.localdb.LocalDB;
+import com.d.localdb.MemoryRecord;
 import com.d.utility.BatteryInfoCollector;
+import com.d.utility.MemoryUsageCollector;
 
-public class BatteryControllerActivity extends MyWebActivity {
+public class MemoryActivity extends MyWebActivity {
 
-	BatteryInfoCollector bctr;
+
+	MemoryUsageCollector muc;
 	private TextView tv;
 	private Handler handler;
 	
@@ -38,22 +35,21 @@ public class BatteryControllerActivity extends MyWebActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_battery);
-		ldb = new LocalDB(getBaseContext(), BatteryRecord.TABLE);
-		yaxisName = "Battery (%)";
-		
+		ldb = new LocalDB(getBaseContext(), MemoryRecord.TABLE);
+		yaxisName = "Memory (%)";
 		handler = new Handler();
-		ldb = new LocalDB(getBaseContext(), BatteryRecord.TABLE);
+		
 		
 		TabHost tabhost = (TabHost) findViewById(android.R.id.tabhost);
 	    tabhost.setup();
 	    TabSpec ts = tabhost.newTabSpec("tag1"); 
 	    ts.setContent(R.id.graph);
-	    ts.setIndicator("Capacity graph");
+	    ts.setIndicator("Memory graph");
 	    tabhost.addTab(ts);
 
 	    ts = tabhost.newTabSpec("tag2"); 
 	    ts.setContent(R.id.present);
-	    ts.setIndicator("Present state");  
+	    ts.setIndicator("Memory Logs");  
 	    tabhost.addTab(ts);
 		
 		tv = (TextView) findViewById(R.id.text);
@@ -76,24 +72,20 @@ public class BatteryControllerActivity extends MyWebActivity {
 
 			@Override
 			public void run() {
-				List<BatteryRecord> elements = ldb.getAll(null, null, null, true, 1);
+				List<MemoryRecord> elements = ldb.getAll(null, null, null, true, 100);
 
 				String output = "";
-				for (BatteryRecord record : elements) {
-					output = record.toString() + "\n";
-
-					Log.d("print", output);
+				for (MemoryRecord record : elements) {
+					output += record.toString() + "\n";
 				}
+				Log.d("memoryActivity", output);
 				tv.setText(output);
-				//setContentView(tv);
-				//setContentView(webview);
 				tv.invalidate();
 
 				handler.postDelayed(this, 500); // set time here to refresh
 			}
 		});
 
-		// setContentView(tv);
 
 	}
 
@@ -103,5 +95,21 @@ public class BatteryControllerActivity extends MyWebActivity {
 		handler.removeMessages(0);
 		ldb.close();
 	}
-
+	
+	@Override
+	protected Information getInformation() {
+        Information info = new Information();
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DAY_OF_MONTH, -1);
+        List<MemoryRecord> records = ldb.getAll(null, cal.getTime(), null, true, 20000);
+        ArrayList<GraphRow> data = new ArrayList<MyWebActivity.GraphRow>(records.size());
+        for (MemoryRecord record : records) {
+            GraphRow row = new GraphRow();
+            row.date = dateFormat.format(record.time);
+            row.percentage = (float)record.percentageOfMemoryUsage;
+            data.add(row);
+        }
+        info.data = data;
+        return info;
+	}
 }

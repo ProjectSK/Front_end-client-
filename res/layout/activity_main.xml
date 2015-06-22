@@ -9,23 +9,13 @@
     tools:context="com.d.activity.AppUsageActivity" >
 
     <Button
-        android:id="@+id/BatteryController"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="39dp"
-        android:layout_marginTop="47dp"
-        android:text="Battery Controller" />
-
-    <Button
         android:id="@+id/AppUsageActivity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/BatteryController"
         android:layout_alignRight="@+id/BatteryController"
         android:layout_below="@+id/BatteryController"
-        android:layout_marginTop="39dp"
+        android:layout_marginTop="20dp"
         android:text="App Usage" />
 
     <Button
@@ -35,27 +25,36 @@
         android:layout_alignLeft="@+id/AppUsageActivity"
         android:layout_alignRight="@+id/AppUsageActivity"
         android:layout_below="@+id/AppUsageActivity"
-        android:layout_marginTop="41dp"
-        android:text="LocationLog" />
+        android:layout_marginTop="20dp"
+        android:text="Location" />
 
     <Button
-        android:id="@+id/deleteTables"
+        android:id="@+id/membtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/LocationLog"
         android:layout_alignRight="@+id/LocationLog"
         android:layout_below="@+id/LocationLog"
-        android:layout_marginTop="34dp"
-        android:text="deleteTables" />
+        android:layout_marginTop="20dp"
+        android:text="Memory" />
 
     <Button
-        android:id="@+id/myWebViewBtn"
+        android:id="@+id/deleteTables"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/deleteTables"
-        android:layout_alignRight="@+id/deleteTables"
-        android:layout_below="@+id/deleteTables"
-        android:layout_marginTop="18dp"
-        android:text="WebView" />
+        android:layout_alignLeft="@+id/membtn"
+        android:layout_alignRight="@+id/membtn"
+        android:layout_below="@+id/membtn"
+        android:layout_marginTop="20dp"
+        android:text="Stop service" />
+
+    <Button
+        android:id="@+id/BatteryController"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:text="Battery Controller" />
 
 </RelativeLayout>
