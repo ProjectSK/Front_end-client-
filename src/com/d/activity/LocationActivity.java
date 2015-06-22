@@ -1,18 +1,27 @@
 package com.d.activity;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.webkit.WebView;
 import android.widget.SeekBar;
+import android.widget.TabHost;
+import android.widget.TextView;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.TabHost.TabSpec;
 
+import com.d.localdb.AppUsageRecord;
 import com.d.localdb.LocalDB;
 import com.d.localdb.LocationLogRecord;
 import com.google.android.gms.maps.CameraUpdate;
@@ -132,13 +141,62 @@ public class LocationActivity extends Activity {
 		private Handler mHandler;
 		
 		private SeekBar resolutionSeekBar;
-		
-
+		TextView tv;
+		private Handler handler;
+		private static SimpleDateFormat dateFormat = new SimpleDateFormat(
+				"HH:mm:ss", Locale.getDefault());
 
 		@Override
 		protected void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
+			
 			setContentView(R.layout.activity_location);
+			TabHost tabhost = (TabHost) findViewById(android.R.id.tabhost);
+		    tabhost.setup();
+		    TabSpec ts = tabhost.newTabSpec("tag1"); 
+		    ts.setContent(R.id.loc_tab1);
+		    ts.setIndicator("map");
+		    tabhost.addTab(ts);
+
+		    ts = tabhost.newTabSpec("tag2"); 
+		    ts.setContent(R.id.loc_tab2);
+		    ts.setIndicator("log");  
+		    tabhost.addTab(ts);
+			
+			tv = (TextView) findViewById(R.id.loc_textView1);
+			handler = new Handler();
+			String output = "";
+			tv.setText(output);
+			tv.setMovementMethod(new ScrollingMovementMethod());
+			
+			ldb_loc = new LocalDB(getBaseContext(), LocationLogRecord.TABLE);
+			handler.post(new Runnable() {
+
+				@Override
+				public void run() {
+					List<LocationLogRecord> elements = ldb_loc.getAll(null, null,
+							null, true, 100);
+
+					String output = "";
+					for (LocationLogRecord record : elements) {
+						output += " ( ";
+						output += record.latitude;
+						output += " , ";
+						output += record.longtitude;
+						output += " ) , ";
+						output += dateFormat.format(record.time);
+						output += "\n";
+
+						// Log.d("print",output);
+					}
+					tv.setText(output);
+					tv.invalidate();
+
+					handler.postDelayed(this, 1000); // set time here to refresh
+				}
+			});		
+			
+			
 			resolutionSeekBar = (SeekBar)findViewById(R.id.seekBar_resolution);
 			resolutionSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
                 @Override
@@ -161,9 +219,11 @@ public class LocationActivity extends Activity {
             });
 
 			mHandler = new Handler();
-			ldb_loc = new LocalDB(getBaseContext(), LocationLogRecord.TABLE);
 			if (googleMap == null) {
                 googleMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.location_map)).getMap();
+            }
+			else{
+				Log.d("notnull","notnull");
 			}
 			googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 			googleMap.moveCamera(CameraUpdateFactory.zoomBy(12));
@@ -191,6 +251,9 @@ public class LocationActivity extends Activity {
 		public void onDestroy() {
 			super.onDestroy();
 			mHandler.removeMessages(0);
+			handler.removeMessages(0);
+			if(ldb_loc != null)
+				ldb_loc.close();
 		}
 
 		@Override

@@ -21,6 +21,8 @@ import com.d.httpmodule.HttpConnect;
 import com.d.localdb.AppUsageRecord;
 import com.d.localdb.LocalDB;
 import com.d.localdb.LocationLogRecord;
+import com.d.utility.AlarmReceiver;
+import com.d.utility.SenderService;
 import com.d.utility.ServiceClass;
 
 public class MainActivity extends Activity {
@@ -49,6 +51,7 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
 
 		
 		batteryControllerBotton = (Button)findViewById(R.id.BatteryController);
@@ -63,7 +66,12 @@ public class MainActivity extends Activity {
 		
 		Intent serviceIntent = new Intent(MainActivity.this, ServiceClass.class);
         startService(serviceIntent);
+
+        serviceIntent = new Intent(MainActivity.this, SenderService.class);
+        startService(serviceIntent);
+
         Log.d("main", "onStart()");
+        
 		
 		
 		batteryControllerBotton.setOnClickListener(new OnClickListener(){
