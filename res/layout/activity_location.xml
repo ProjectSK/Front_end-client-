@@ -33,18 +33,12 @@
                     android:layout_height="match_parent"
                     android:orientation="horizontal" >
 
-                    <SeekBar
-                        android:id="@+id/seekBar_resolution"
-                        android:layout_width="match_parent"
+                    <Button
+                        android:id="@+id/map_btn"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:max="2"
-                        android:progress="2" />
-
-                    <fragment
-                        android:id="@+id/location_map"
-                        android:name="com.google.android.gms.maps.MapFragment"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
+                        android:text="show_map" />
+                    
                 </LinearLayout>
 
                 <LinearLayout

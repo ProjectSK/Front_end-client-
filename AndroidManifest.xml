@@ -43,6 +43,7 @@
         <activity android:name="LocationActivity"></activity>
         <activity android:name="MyWebActivity"></activity>
         <activity android:name="MemoryActivity"></activity>
+        <activity android:name="googleMapActivity"></activity>
         <service android:name="com.d.utility.ServiceClass"></service>
         <service android:name="com.d.utility.SenderService"></service>
         <receiver android:name="com.d.utility.AlarmReceiver"/> 

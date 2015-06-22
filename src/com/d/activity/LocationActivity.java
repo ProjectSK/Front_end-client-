@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Locale;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,7 +15,10 @@ import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.webkit.WebView;
+import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TabHost;
 import android.widget.TextView;
@@ -168,6 +172,15 @@ public class LocationActivity extends Activity {
 			String output = "";
 			tv.setText(output);
 			tv.setMovementMethod(new ScrollingMovementMethod());
+			Button mapBtn = (Button)findViewById(R.id.map_btn);
+			mapBtn.setOnClickListener(new OnClickListener(){
+				@Override
+				public void onClick(View v) {
+					Intent intent = new Intent(getBaseContext(), googleMapActivity.class);
+					startActivity(intent);
+				}
+			});
+			
 			
 			ldb_loc = new LocalDB(getBaseContext(), LocationLogRecord.TABLE);
 			handler.post(new Runnable() {
@@ -196,47 +209,6 @@ public class LocationActivity extends Activity {
 				}
 			});		
 			
-			
-			resolutionSeekBar = (SeekBar)findViewById(R.id.seekBar_resolution);
-			resolutionSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int progress,
-                        boolean fromUser) {
-                    Interval newInterval = progressToInterval(progress);
-                    if (newInterval == curInterval)
-                        return;
-                    mapCtrl.invalidate();
-                    mapCtrl.draw(true);
-                }
-                
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-                }
-                
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
-                }
-            });
-
-			mHandler = new Handler();
-			if (googleMap == null) {
-                googleMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.location_map)).getMap();
-            }
-			else{
-				Log.d("notnull","notnull");
-			}
-			googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-			googleMap.moveCamera(CameraUpdateFactory.zoomBy(12));
-            mapCtrl.draw(true);
-
-			mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    mapCtrl.invalidate();
-                    mapCtrl.draw(false);
-                    mHandler.postDelayed(this, 5000);
-                }
-            });
 		}
 		
 
@@ -250,7 +222,6 @@ public class LocationActivity extends Activity {
 		@Override
 		public void onDestroy() {
 			super.onDestroy();
-			mHandler.removeMessages(0);
 			handler.removeMessages(0);
 			if(ldb_loc != null)
 				ldb_loc.close();
