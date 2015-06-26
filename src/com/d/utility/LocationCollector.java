@@ -127,8 +127,8 @@ public class LocationCollector implements LocationListener {
 		}
 		if (location != null)
 			return new LocationLogRecord(Calendar.getInstance().getTime(),
-					(float) (location.getLatitude()),
-					(float) (location.getLongitude()));
+					 (location.getLatitude()),
+					 (location.getLongitude()));
 		return null;
 	}
 

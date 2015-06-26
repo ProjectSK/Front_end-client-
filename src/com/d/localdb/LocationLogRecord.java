@@ -9,18 +9,18 @@ public class LocationLogRecord implements Record {
     public static SQLVTable TABLE = new SQLVDatedTable(RecordFactory.reflection(LocationLogRecord.class), "location", "time",
                 new SQLVColumn [] {
                     new ReflVColumn(LocationLogRecord.class, "time", ColumnType.Datetime, true),
-                    new ReflVColumn(LocationLogRecord.class, "latitude", ColumnType.Float, false),
-                    new ReflVColumn(LocationLogRecord.class, "longtitude", ColumnType.Float, false)
+                    new ReflVColumn(LocationLogRecord.class, "latitude", ColumnType.Double, false),
+                    new ReflVColumn(LocationLogRecord.class, "longtitude", ColumnType.Double, false)
         });
 
-    public Float latitude;
+    public Double latitude;
 
-    public Float longtitude;
+    public Double longtitude;
 
     public Date time;
     public LocationLogRecord() {
     }
-    public LocationLogRecord(Date time, Float latitude, Float longtitude) {
+    public LocationLogRecord(Date time, Double latitude, Double longtitude) {
         this.time = time;
         this.latitude = latitude;
         this.longtitude = longtitude;

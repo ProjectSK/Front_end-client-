@@ -61,6 +61,8 @@ public class ReflVColumn extends SQLVColumn {
             return s;
         case Float:
             return Float.parseFloat(s);
+        case Double:
+        	return Double.parseDouble(s);        
         default:
             return null;
         }
@@ -76,6 +78,8 @@ public class ReflVColumn extends SQLVColumn {
             return String.class;
         case Float:
             return Float.class;
+        case Double:
+        	return Double.class;
         }
         return null;
     }
@@ -90,6 +94,8 @@ public class ReflVColumn extends SQLVColumn {
             return (String)obj;
         case Float:
             return obj.toString();
+        case Double:
+        	return obj.toString();
         default:
             return obj.toString();
         }
