@@ -13,6 +13,7 @@ import android.util.Log;
 
 import com.d.localdb.AppUsageRecord;
 import com.d.localdb.BatteryRecord;
+import com.d.localdb.CPURecord;
 import com.d.localdb.LocalDB;
 import com.d.localdb.LocationLogRecord;
 import com.d.localdb.MemoryRecord;
@@ -58,8 +59,9 @@ public class ServiceClass extends Service {
 	// DEBUG
 	private long interval = 1000;
 	private LocationCollector lc;
+	private CpuUsageCollector cuc;
 
-	private LocalDB ldb_usage, ldb_loc, ldb_bat, ldb_mem;
+	private LocalDB ldb_usage, ldb_loc, ldb_bat, ldb_mem, ldb_cpu;
 
 	private MemoryUsageCollector muc;
 
@@ -97,11 +99,14 @@ public class ServiceClass extends Service {
 		auc = new AppUsageCollector(getBaseContext());
 		lc = new LocationCollector(getBaseContext());
 		muc = new MemoryUsageCollector(getBaseContext());
+		cuc = new CpuUsageCollector();
 
 		handler = new Handler();
 		handler.post(new Runnable() {
 			@Override
 			public void run() {
+
+		        new CpuUsageCollector().getRecord();
 				Log.d("slog", "ServiceClass is running on AppUsageLog\n");
 				ldb_usage = new LocalDB(getBaseContext(), AppUsageRecord.TABLE);
 				try{
@@ -114,6 +119,19 @@ public class ServiceClass extends Service {
 				finally {
 					ldb_usage.close();
 				}
+
+				ldb_cpu = new LocalDB(getBaseContext(), CPURecord.TABLE);
+				try{
+					
+					CPURecord record = cuc.getRecord();
+					if(record != null){
+						ldb_cpu.addRecord(record);
+					}
+				}
+				finally {
+					ldb_cpu.close();
+				}
+				
 				
 				ldb_loc = new LocalDB(getBaseContext(), LocationLogRecord.TABLE);
 				try {

@@ -2,7 +2,7 @@ package com.d.localdb;
 
 public abstract class SQLVColumn {
     public static enum ColumnType {
-        Datetime, Float, Long, String
+        Datetime, Float, Long, String, Double
     }
 
     public final boolean isPrimaryKey;
@@ -37,6 +37,8 @@ public abstract class SQLVColumn {
             return "TEXT";
         case Float:
             return "REAL";
+        case Double:
+        	return "REAL";
         default:
             return "UNKNOWN";
         }

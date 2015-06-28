@@ -78,15 +78,18 @@ public class BatteryControllerActivity extends MyWebActivity {
 			public void run() {
 				List<BatteryRecord> elements = ldb.getAll(null, null, null, true, 1);
 
-				String output = "";
-				for (BatteryRecord record : elements) {
-					output = record.toString() + "\n";
-
-					Log.d("print", output);
+				String batteryInfoMessage = "";
+				for (BatteryRecord record : elements) {								
+					batteryInfoMessage += "Battery Voltage : " + record.voltage + "mV\n";
+					batteryInfoMessage += "Battery Level : " + record.level + "\n";
+					batteryInfoMessage += "Battery Scale : " + record.scale + "\n";
+					batteryInfoMessage += "Battery Temperature : " + record.temperature + "¢ªC\n";
+					batteryInfoMessage += "Battery Plug Type : " + record.plugType + "\n";
+					batteryInfoMessage += "Battery Health Type : " + record.healthType + "\n";
+					batteryInfoMessage += "Battery Capacity : " + record.capacity + "%\n";
+					
 				}
-				tv.setText(output);
-				//setContentView(tv);
-				//setContentView(webview);
+				tv.setText(batteryInfoMessage);
 				tv.invalidate();
 
 				handler.postDelayed(this, 500); // set time here to refresh

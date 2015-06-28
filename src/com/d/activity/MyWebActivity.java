@@ -72,22 +72,7 @@ public class MyWebActivity extends Activity {
      
        
 		super.onCreate(savedInstanceState);
-		/*ldb = new LocalDB(getBaseContext(), BatteryRecord.TABLE);
-	    yaxisName =  "Battery (%)";
-		webview = new WebView(this);
-		setContentView(webview, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-		try {
-            webview.loadDataWithBaseURL("file:///android_asset/", getAssetAsString("html/area.html"), "text/html; charset=utf-8", null, null);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-		webview.getSettings().setJavaScriptEnabled(true);
-		webview.getSettings().setDomStorageEnabled(true);
-		webview.getSettings().setLoadWithOverviewMode(true);
-		webview.addJavascriptInterface(new JSInterface(), "Android");
-
-	
-		setContentView(webview);*/
+		
 	}
 	
 	protected Information getInformation() {

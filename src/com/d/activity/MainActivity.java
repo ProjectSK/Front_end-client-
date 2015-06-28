@@ -22,6 +22,7 @@ import com.d.localdb.AppUsageRecord;
 import com.d.localdb.LocalDB;
 import com.d.localdb.LocationLogRecord;
 import com.d.utility.AlarmReceiver;
+import com.d.utility.CpuUsageCollector;
 import com.d.utility.SenderService;
 import com.d.utility.ServiceClass;
 
@@ -71,7 +72,6 @@ public class MainActivity extends Activity {
         startService(serviceIntent);
 
         Log.d("main", "onStart()");
-        
 		
 		
 		batteryControllerBotton.setOnClickListener(new OnClickListener(){
