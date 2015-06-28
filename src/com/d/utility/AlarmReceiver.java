@@ -18,6 +18,7 @@ import com.d.localdb.AppUsageRecord;
 import com.d.localdb.BatteryRecord;
 import com.d.localdb.LocalDB;
 import com.d.localdb.LocationLogRecord;
+import com.d.localdb.MemoryRecord;
 import com.d.localdb.Record;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -56,6 +57,8 @@ public class AlarmReceiver extends BroadcastReceiver {
         final LocalDB locationDB = new LocalDB(context, LocationLogRecord.TABLE);
         final LocalDB appUsageDB = new LocalDB(context, AppUsageRecord.TABLE);
         final LocalDB batteryDB = new LocalDB(context, BatteryRecord.TABLE);
+        final LocalDB memoryDB = new LocalDB(context, MemoryRecord.TABLE);
+        //final LocalDB cpuDB = new LocalDB(context, CPURecord.TABLE);
         final LocalDB sentDataDB = new LocalDB(context, SentDateRecord.TABLE);
         final List<SentDateRecord> recent = sentDataDB.getAll(null, null, null, true, 1);
         
@@ -87,6 +90,17 @@ public class AlarmReceiver extends BroadcastReceiver {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                try {
+                    gy.POST(URL + "/memory").withJson(gson.toJson(new Bulk(deviceId, memoryDB.getAll(null, recentUpload, null, false, null)))).send();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                /*try {
+                    gy.POST(URL + "/cpu").withJson(gson.toJson(new Bulk(deviceId, cpuDB.getAll(null, recentUpload, null, false, null)))).send();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }*/
+                
             }
         }).start();
         sentDataDB.addRecord(new SentDateRecord(Calendar.getInstance().getTime()));

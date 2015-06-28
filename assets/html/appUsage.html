@@ -1,0 +1,135 @@
+<html>
+<head>
+<script type="text/javascript" src="http://mbostock.github.com/d3/d3.min.js"></script>
+<style>
+/*
+.bar {
+      fill: steelblue;
+}
+
+.bar:hover {
+      fill: brown;
+}
+*/
+.axis {
+      font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+      fill: none;
+        stroke: #000;
+          shape-rendering: crispEdges;
+}
+
+.x.axis path {
+      display: none;
+}
+
+</style>
+
+</head>
+<body>
+<div id="viz"></div>
+<div id = "test"></div>
+<script type="text/javascript">
+    var margin = {top: 20, right: 80, bottom: 30, left: 300},
+        width = 2000 - margin.left - margin.right,
+        height = 250 - margin.top - margin.bottom;
+
+    var parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse;
+
+    var x = d3.time.scale()
+        .range([0, width]);
+
+    var y = d3.scale.ordinal()
+        .rangeRoundBands([0, height], .01);
+
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom");
+
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left");
+
+    var color = d3.scale.category10();
+
+    var svg = d3.select("#viz").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    
+
+    var test = document.getElementById('test')
+
+
+  	var info = JSON.parse(Android.info());
+    var yaxisDesc = info.yaxisDesc;
+    var data = info.data;
+
+
+    data.forEach(function(d){
+            var oldtime =new Date(d.startTime);
+            var newtime = new Date(oldtime.getTime()+Number(d.elapsedTime));
+            d.startTime = parseDate(d.startTime);
+            d.elapsedTime = newtime;
+            });
+
+    var obj =d3.max(data,function(d){
+        return d.elapsedTime;
+        });
+    data.push({"name":data[0].name,"startTime":obj,"elapsedTime":obj});
+    
+    var packageName = data.map(function(obj){
+            return obj.name;
+            });
+
+    var unique = packageName.filter(function(elem, index, self) {
+                return index == self.indexOf(elem);
+                })
+
+    color.domain(unique);
+
+
+
+    x.domain(d3.extent(data, function(d){return d.startTime;}));
+    y.domain(data.map(function(d) { return d.name; }));
+
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
+
+
+    svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+    .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text(yaxisDesc);
+
+
+    svg.selectAll(".bar")
+        .data(data)
+    .enter().append("rect")
+        .attr("class", "bar")
+        .attr("y", function(d) { return y(d.name)+margin.top; })
+        .attr("height", 10)
+        .attr("x", function(d) { return x(d.startTime); })
+        .attr("width", function(d) { if(x(d.elapsedTime)!==x(d.startTime)) return x(d.elapsedTime)-x(d.startTime) })
+        .style("fill", function(d){ return color(d.name);});
+
+
+
+
+
+
+</script>
+</body>
+</html>
