@@ -57,11 +57,11 @@ public class BatteryControllerActivity extends MyWebActivity {
 	    tabhost.addTab(ts);
 		
 		tv = (TextView) findViewById(R.id.text);
-		webview =  (WebView) findViewById(R.id.webview);
+		webview =  (WebView) findViewById(R.id.webview_battery);
 	
 		try {
 			webview.loadDataWithBaseURL("file:///android_asset/",
-					getAssetAsString("html/area.html"),
+					getAssetAsString("html/battery.html"),
 					"text/html; charset=utf-8", null, null);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -83,7 +83,7 @@ public class BatteryControllerActivity extends MyWebActivity {
 					batteryInfoMessage += "Battery Voltage : " + record.voltage + "mV\n";
 					batteryInfoMessage += "Battery Level : " + record.level + "\n";
 					batteryInfoMessage += "Battery Scale : " + record.scale + "\n";
-					batteryInfoMessage += "Battery Temperature : " + record.temperature + "¢ªC\n";
+					batteryInfoMessage += "Battery Temperature : " + record.temperature + "ï¿½ï¿½C\n";
 					batteryInfoMessage += "Battery Plug Type : " + record.plugType + "\n";
 					batteryInfoMessage += "Battery Health Type : " + record.healthType + "\n";
 					batteryInfoMessage += "Battery Capacity : " + record.capacity + "%\n";

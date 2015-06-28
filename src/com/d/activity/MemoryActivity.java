@@ -53,7 +53,7 @@ public class MemoryActivity extends MyWebActivity {
 	    tabhost.addTab(ts);
 		
 		tv = (TextView) findViewById(R.id.text);
-		webview =  (WebView) findViewById(R.id.webview);
+		/*webview =  (WebView) findViewById(R.id.webview_memory);
 	
 		try {
 			webview.loadDataWithBaseURL("file:///android_asset/",
@@ -65,7 +65,7 @@ public class MemoryActivity extends MyWebActivity {
 		webview.getSettings().setJavaScriptEnabled(true);
 		webview.getSettings().setDomStorageEnabled(true);
 		webview.getSettings().setLoadWithOverviewMode(true);
-		webview.addJavascriptInterface(new JSInterface(), "Android");
+		webview.addJavascriptInterface(new JSInterface(), "Android");*/
 		
 
 		handler.post(new Runnable() {

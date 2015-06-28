@@ -1,5 +1,6 @@
 package com.d.activity;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
@@ -10,12 +11,14 @@ import android.os.Handler;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.webkit.WebView;
 import android.widget.TextView;
 
+import com.d.activity.MyWebActivity.JSInterface;
 import com.d.localdb.AppUsageRecord;
 import com.d.localdb.LocalDB;
 
-public class AppUsageActivity extends Activity {
+public class AppUsageActivity extends MyWebActivity {
 	private static SimpleDateFormat dateFormat = new SimpleDateFormat(
 			"HH:mm:ss", Locale.getDefault());
 	private int display_num;
@@ -60,6 +63,19 @@ public class AppUsageActivity extends Activity {
 				handler.postDelayed(this, 500); // set time here to refresh
 			}
 		});
+		webview =  (WebView) findViewById(R.id.webview_appUsage);
+		
+		try {
+			webview.loadDataWithBaseURL("file:///android_asset/",
+					getAssetAsString("html/battery.html"),
+					"text/html; charset=utf-8", null, null);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		webview.getSettings().setJavaScriptEnabled(true);
+		webview.getSettings().setDomStorageEnabled(true);
+		webview.getSettings().setLoadWithOverviewMode(true);
+		webview.addJavascriptInterface(new JSInterface(), "Android");
 
 	}
 
