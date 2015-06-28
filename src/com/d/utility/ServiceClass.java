@@ -105,21 +105,8 @@ public class ServiceClass extends Service {
 		handler.post(new Runnable() {
 			@Override
 			public void run() {
-
 		        new CpuUsageCollector().getRecord();
-				Log.d("slog", "ServiceClass is running on AppUsageLog\n");
-				ldb_usage = new LocalDB(getBaseContext(), AppUsageRecord.TABLE);
-				try{
-					
-					List<AppUsageRecord> records = auc.getUsageRecords();
-					for (AppUsageRecord record : records) {
-						ldb_usage.addRecord(record);
-					}
-				}
-				finally {
-					ldb_usage.close();
-				}
-
+				
 				ldb_cpu = new LocalDB(getBaseContext(), CPURecord.TABLE);
 				try{
 					
@@ -131,7 +118,8 @@ public class ServiceClass extends Service {
 				finally {
 					ldb_cpu.close();
 				}
-				
+
+				auc.saveRecords();
 				
 				ldb_loc = new LocalDB(getBaseContext(), LocationLogRecord.TABLE);
 				try {

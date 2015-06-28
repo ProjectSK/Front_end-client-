@@ -13,10 +13,12 @@ import android.content.Context;
 import android.util.Log;
 
 import com.d.localdb.AppUsageRecord;
+import com.d.localdb.LocalDB;
 
 /**
- * 어플리케이션이 foreground로 얼마간 나왔는지를 확인하기 위한 class 
- * @author vs223 
+ * 어플리케이션이 foreground로 얼마간 나왔는지를 확인하기 위한 class
+ * 
+ * @author vs223
  */
 public class AppUsageCollector {
 	private static final SimpleDateFormat dateFormat = new SimpleDateFormat(
@@ -29,9 +31,11 @@ public class AppUsageCollector {
 	private final Context mContext;
 	private List<UsageStats> stats;
 	private UsageStatsManager usageStatsManager;
+	private LocalDB locdb;
 
 	/**
-	 * @param context 정보를 추출하기위한 context, 특별한 의도가 없다면 getBaseContext()를 추천한다. 
+	 * @param context
+	 *            정보를 추출하기위한 context, 특별한 의도가 없다면 getBaseContext()를 추천한다.
 	 */
 	public AppUsageCollector(Context context) {
 		mContext = context;
@@ -42,15 +46,17 @@ public class AppUsageCollector {
 	}
 
 	/**
-	 * 생성자에서 받은 Context에서 AppUsageEvents를 받아  AppUsageRecord의 record type들의 list를 return하는 함수
-	 * @return  List<AppUsageRecord>
+	 * 생성자에서 받은 Context에서 AppUsageEvents를 받아 AppUsageRecord의 record type들의 list를
+	 * return하는 함수
+	 * 
+	 * @return List<AppUsageRecord>
 	 */
-	public List<AppUsageRecord> getUsageRecords() {
+	private List<AppUsageRecord> updateRecords() {
 		UsageStatsManager usm = (UsageStatsManager) mContext
 				.getSystemService("usagestats");
 
 		long endTime = System.currentTimeMillis();
-		long startTime = System.currentTimeMillis() - 60 * 100000;
+		long startTime = System.currentTimeMillis() - 100 * 60 * 1000;
 
 		Log.d(TAG, "Range start:" + dateFormat.format(startTime));
 		Log.d(TAG, "Range end:" + dateFormat.format(endTime));
@@ -88,6 +94,18 @@ public class AppUsageCollector {
 		}
 
 		return usageRecords;
+	}
+
+	public void saveRecords() {
+		locdb = new LocalDB(mContext, AppUsageRecord.TABLE);
+		try {
+			List<AppUsageRecord> records = updateRecords();
+			for (AppUsageRecord record : records) {
+				locdb.addRecord(record);
+			}
+		} finally {
+			locdb.close();
+		}
 	}
 
 	private List<UsageStats> getUsages() {
