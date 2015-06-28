@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+#map-canvas {
+    width: 960px;
+    height: 800px;
+}
+</style>
+<script src="https://maps.googleapis.com/maps/api/js"></script>
+<script>
+function initialize() {
+    var myLatlng = new google.maps.LatLng(50,50);
+    var js = '{{ Latlngs|tojson|safe }}'
+    var Latlng = JSON.parse(js)
+/*    for(var i=0;i<Latlng.length;i++){
+        var loc = new google.maps.LatLng(Number(Latlng[i].lat), Number(Latlng[i].lng))
+            locmark.push( new google.maps.Marker({
+                        position: loc
+                        map: map,
+                        title: Latlng[i].time
+                        });
+                    }*/
+    var mapCanvas = document.getElementById('map-canvas');
+    var lastloc = new google.maps.LatLng(Number(Latlng[Latlng.length-1].lat),Number(Latlng[Latlng.length-1].lng))
+    var mapOptions = {
+        center: lastloc,
+        zoom: 11,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+    }
+    var map = new google.maps.Map(mapCanvas, mapOptions)
+    var marker
+    var i
+    var infowindow = new google.maps.InfoWindow(); 
+    for(i=0;i<Latlng.length;i++){
+        marker = new google.maps.Marker({
+                position: new google.maps.LatLng(Number(Latlng[i].lat),Number(Latlng[i].lng)),
+                map: map,
+                time: Latlng[i].time
+                });
+        google.maps.event.addListener(marker, 'click', function() {
+                    map.setZoom(14)
+                    map.setCenter(marker.getPosition());
+                    });
+    
+    }
+}
+google.maps.event.addDomListener(window, 'load', initialize);
+</script>
+</head>
+<body>
+<div id="map-canvas"></div>
+</body>
+</html>
