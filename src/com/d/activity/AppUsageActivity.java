@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.d.api.AppUsage;
 import com.d.localdb.AppUsageRecord;
 import com.d.localdb.LocalDB;
 
@@ -21,7 +22,7 @@ public class AppUsageActivity extends Activity {
 	private int display_num;
 	private Handler handler;
 	// CollectorMain collector;
-	LocalDB ldb_usage;
+	private AppUsage au;
 	private TextView tv;
 
 	@Override
@@ -35,25 +36,32 @@ public class AppUsageActivity extends Activity {
 		setContentView(tv);
 		tv.setMovementMethod(new ScrollingMovementMethod());
 
-		ldb_usage = new LocalDB(getBaseContext(), AppUsageRecord.TABLE);
+		au = new AppUsage(getBaseContext());
 		handler.post(new Runnable() {
 
 			@Override
 			public void run() {
-				List<AppUsageRecord> elements = ldb_usage.getAll(null, null,
-						null, true, 100);
+				List<AppUsage.Resource> stats = au.getStaticInfos();
+				List<AppUsageRecord> records = au.getRecords(100);
 
 				String output = "";
-				for (AppUsageRecord record : elements) {
+
+				output += "Package Name, Overall Time(s), Number of Execution\n";
+				for (AppUsage.Resource res : stats) {
+					output += res.PackageName + ", " + res.overallTime + ", "
+							+ res.numberOfExecution + "\n";
+				}
+
+				output += "\nPackage Name, Start Time, Elapsed Time(ms)\n";
+				for (AppUsageRecord record : records) {
 					output += record.packageName;
 					output += ", ";
 					output += dateFormat.format(record.startTime);
 					output += ", ";
 					output += record.elapsedTime;
 					output += "\n";
-
-					// Log.d("print",output);
 				}
+
 				tv.setText(output);
 				tv.invalidate();
 

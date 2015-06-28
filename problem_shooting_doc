@@ -1,0 +1,5 @@
+1. problem : Error Parsing: C:\android-sdk_r24.2-windows\android-sdk-windows\system-images\android-22\android-wear\armeabi-v7a cvc-complex-type.2.4.d: Invalid content was found starting with element 'd:skin'. No child element is expected at this point.
+solution : http://stackoverflow.com/questions/30439524/error-loading-the-sdk-when-eclipse-is-started
+
+2. problem : C:\Users\JUN\git\Front_end-client-\AndroidManifest.xml:27: error: Error: No resource found that matches the given name (at 'value' with value '@integer/google_play_services_version').
+solution : include google-play-services_lib
