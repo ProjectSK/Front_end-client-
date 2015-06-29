@@ -53,11 +53,11 @@ public class MemoryActivity extends WebMemoryActivity {
 	    tabhost.addTab(ts);
 		
 		tv = (TextView) findViewById(R.id.text);
-		/*webview =  (WebView) findViewById(R.id.webview_memory);
+		webview =  (WebView) findViewById(R.id.webview_battery);
 	
 		try {
 			webview.loadDataWithBaseURL("file:///android_asset/",
-					getAssetAsString("html/area.html"),
+					getAssetAsString("html/memory.html"),
 					"text/html; charset=utf-8", null, null);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -65,7 +65,7 @@ public class MemoryActivity extends WebMemoryActivity {
 		webview.getSettings().setJavaScriptEnabled(true);
 		webview.getSettings().setDomStorageEnabled(true);
 		webview.getSettings().setLoadWithOverviewMode(true);
-		webview.addJavascriptInterface(new JSInterface(), "Android");*/
+		webview.addJavascriptInterface(new JSInterface(), "Android");
 		
 
 		handler.post(new Runnable() {
@@ -96,20 +96,5 @@ public class MemoryActivity extends WebMemoryActivity {
 		ldb.close();
 	}
 	
-	@Override
-	protected Information getInformation() {
-        Information info = new Information();
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_MONTH, -1);
-        List<MemoryRecord> records = ldb.getAll(null, cal.getTime(), null, true, 20000);
-        ArrayList<GraphRow> data = new ArrayList<WebMemoryActivity.GraphRow>(records.size());
-        for (MemoryRecord record : records) {
-            GraphRow row = new GraphRow();
-            row.date = dateFormat.format(record.time);
-            row.percentage = (float)record.percentageOfMemoryUsage;
-            data.add(row);
-        }
-        info.data = data;
-        return info;
-	}
+	
 }
