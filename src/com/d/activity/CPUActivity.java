@@ -17,6 +17,7 @@ import com.d.activity.WebBatteryActivity.GraphRow;
 import com.d.activity.WebBatteryActivity.Information;
 import com.d.activity.WebBatteryActivity.JSInterface;
 import com.d.localdb.BatteryRecord;
+import com.d.localdb.CPURecord;
 import com.d.localdb.LocalDB;
 import com.d.localdb.MemoryRecord;
 import com.d.utility.BatteryInfoCollector;
@@ -44,12 +45,12 @@ public class CPUActivity extends WebCPUActivity {
 	    tabhost.setup();
 	    TabSpec ts = tabhost.newTabSpec("tag1"); 
 	    ts.setContent(R.id.graph);
-	    ts.setIndicator("Memory graph");
+	    ts.setIndicator("CPU graph");
 	    tabhost.addTab(ts);
 
 	    ts = tabhost.newTabSpec("tag2"); 
 	    ts.setContent(R.id.present);
-	    ts.setIndicator("Memory Logs");  
+	    ts.setIndicator("CPU Logs");  
 	    tabhost.addTab(ts);
 		
 		tv = (TextView) findViewById(R.id.text);
@@ -72,13 +73,13 @@ public class CPUActivity extends WebCPUActivity {
 
 			@Override
 			public void run() {
-				List<MemoryRecord> elements = ldb.getAll(null, null, null, true, 100);
+				List<CPURecord> elements = ldb.getAll(null, null, null, true, 100);
 
 				String output = "";
-				for (MemoryRecord record : elements) {
+				for (CPURecord record : elements) {
 					output += record.toString() + "\n";
 				}
-				Log.d("memoryActivity", output);
+				//Log.d("CPUActivity", output);
 				tv.setText(output);
 				tv.invalidate();
 

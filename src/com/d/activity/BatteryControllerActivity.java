@@ -40,9 +40,7 @@ public class BatteryControllerActivity extends WebBatteryActivity {
 		setContentView(R.layout.activity_battery);
 		ldb = new LocalDB(getBaseContext(), BatteryRecord.TABLE);
 		yaxisName = "Battery (%)";
-		
 		handler = new Handler();
-		ldb = new LocalDB(getBaseContext(), BatteryRecord.TABLE);
 		
 		TabHost tabhost = (TabHost) findViewById(android.R.id.tabhost);
 	    tabhost.setup();

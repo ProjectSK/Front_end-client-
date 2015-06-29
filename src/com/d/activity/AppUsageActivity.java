@@ -73,8 +73,7 @@ public class AppUsageActivity extends WebAppUsageActivity {
 		View webViewLayout = ((LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE))
 	            .inflate(R.layout.activity_app_usage, null, false);
 		webview =  (WebView) webViewLayout.findViewById(R.id.webview_appUsage);//webView is NULL?
-		if(webview==null)
-			Log.d("NULLCHECK","webview is NULL");
+		
 			
 
 		webview.getSettings().setJavaScriptEnabled(true);

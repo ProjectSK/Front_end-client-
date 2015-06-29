@@ -39,7 +39,6 @@ public class MemoryActivity extends WebMemoryActivity {
 		yaxisName = "Memory (%)";
 		handler = new Handler();
 		
-		
 		TabHost tabhost = (TabHost) findViewById(android.R.id.tabhost);
 	    tabhost.setup();
 	    TabSpec ts = tabhost.newTabSpec("tag1"); 
@@ -55,13 +54,14 @@ public class MemoryActivity extends WebMemoryActivity {
 		tv = (TextView) findViewById(R.id.text);
 		webview =  (WebView) findViewById(R.id.webview_battery);
 	
-		try {
+		/*try {
 			webview.loadDataWithBaseURL("file:///android_asset/",
 					getAssetAsString("html/memory.html"),
 					"text/html; charset=utf-8", null, null);
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		}*/
+		webview.loadUrl("file:///android_asset/html/memory.html");
 		webview.getSettings().setJavaScriptEnabled(true);
 		webview.getSettings().setDomStorageEnabled(true);
 		webview.getSettings().setLoadWithOverviewMode(true);
@@ -78,7 +78,7 @@ public class MemoryActivity extends WebMemoryActivity {
 				for (MemoryRecord record : elements) {
 					output += record.toString() + "\n";
 				}
-				Log.d("memoryActivity", output);
+				//Log.d("memoryActivity", output);
 				tv.setText(output);
 				tv.invalidate();
 

@@ -45,7 +45,7 @@ public class WebMemoryActivity extends Activity {
     public static String yaxisName;
     public static class GraphRow {
         public String date;
-        public float percentage;
+        public float percentageUsage;
     }
     public static class Information {
         public String yaxisDesc;
@@ -86,7 +86,7 @@ public class WebMemoryActivity extends Activity {
         for (MemoryRecord record : records) {
             GraphRow row = new GraphRow();
             row.date = dateFormat.format(record.time);
-            row.percentage = (float)record.percentageOfMemoryUsage;
+            row.percentageUsage = (float)record.percentageOfMemoryUsage;
             data.add(row);
         }
         info.data = data;
