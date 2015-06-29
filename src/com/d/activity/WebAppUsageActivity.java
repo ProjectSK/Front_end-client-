@@ -37,7 +37,7 @@ public class WebAppUsageActivity extends Activity {
         String str;
         while ((str=in.readLine()) != null) {
           buf.append(str);
-        }
+        } 
         in.close();
         return buf.toString();
     }
@@ -46,7 +46,7 @@ public class WebAppUsageActivity extends Activity {
     public static class GraphRow {
         public String startTime;
         public Long elapsedTime;
-        public String packageName;
+        public String name;
     }
     public static class Information {
         public String yaxisDesc;
@@ -88,7 +88,7 @@ public class WebAppUsageActivity extends Activity {
             GraphRow row = new GraphRow();
             row.startTime = dateFormat.format(record.startTime);
             row.elapsedTime = record.elapsedTime;
-            row.packageName = record.packageName;
+            row.name = record.packageName;
             data.add(row);
         }
         info.data = data;

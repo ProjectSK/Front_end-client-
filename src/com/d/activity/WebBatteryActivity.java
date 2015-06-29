@@ -44,6 +44,7 @@ public class WebBatteryActivity extends Activity {
     public static class GraphRow {
         public String date;
         public float percentage;
+        public float temperature;
     }
     public static class Information {
         public String yaxisDesc;
@@ -85,6 +86,7 @@ public class WebBatteryActivity extends Activity {
             GraphRow row = new GraphRow();
             row.date = dateFormat.format(record.time);
             row.percentage = (float)record.capacity;
+            row.temperature = (float)record.temperature;
             data.add(row);
         }
         info.data = data;

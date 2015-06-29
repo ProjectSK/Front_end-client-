@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import com.d.activity.WebBatteryActivity.JSInterface;
 import com.d.localdb.AppUsageRecord;
+import com.d.localdb.BatteryRecord;
 import com.d.localdb.LocalDB;
 
 public class AppUsageActivity extends WebAppUsageActivity {
@@ -28,7 +29,7 @@ public class AppUsageActivity extends WebAppUsageActivity {
 	private int display_num;
 	private Handler handler;
 	// CollectorMain collector;
-	LocalDB ldb_usage;
+	//LocalDB ldb_usage;
 	private TextView tv;
 
 	@Override
@@ -42,12 +43,14 @@ public class AppUsageActivity extends WebAppUsageActivity {
 		setContentView(tv);
 		tv.setMovementMethod(new ScrollingMovementMethod());
 
-		ldb_usage = new LocalDB(getBaseContext(), AppUsageRecord.TABLE);
+		
+		ldb = new LocalDB(getBaseContext(), AppUsageRecord.TABLE);
+		yaxisName = "AppPackageName";
 		handler.post(new Runnable() {
 
 			@Override
 			public void run() {
-				List<AppUsageRecord> elements = ldb_usage.getAll(null, null,
+				List<AppUsageRecord> elements = ldb.getAll(null, null,
 						null, true, 100);
 
 				String output = "";
@@ -82,7 +85,7 @@ public class AppUsageActivity extends WebAppUsageActivity {
 			webview.loadDataWithBaseURL("file:///android_asset/",
 					getAssetAsString("html/appUsage.html"),
 					"text/html; charset=utf-8", null, null);*/
-			webview.loadUrl("file:///android_asset/appUsage.html");
+			webview.loadUrl("file:///android_asset/html/appUsage.html");
 		
 		/*} catch (IOException e) {
 			e.printStackTrace();
