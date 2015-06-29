@@ -13,16 +13,16 @@ import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.TabHost.TabSpec;
 
-import com.d.activity.MyWebActivity.GraphRow;
-import com.d.activity.MyWebActivity.Information;
-import com.d.activity.MyWebActivity.JSInterface;
+import com.d.activity.WebBatteryActivity.GraphRow;
+import com.d.activity.WebBatteryActivity.Information;
+import com.d.activity.WebBatteryActivity.JSInterface;
 import com.d.localdb.BatteryRecord;
 import com.d.localdb.LocalDB;
 import com.d.localdb.MemoryRecord;
 import com.d.utility.BatteryInfoCollector;
 import com.d.utility.MemoryUsageCollector;
 
-public class MemoryActivity extends MyWebActivity {
+public class MemoryActivity extends WebMemoryActivity {
 
 
 	MemoryUsageCollector muc;
@@ -102,7 +102,7 @@ public class MemoryActivity extends MyWebActivity {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_MONTH, -1);
         List<MemoryRecord> records = ldb.getAll(null, cal.getTime(), null, true, 20000);
-        ArrayList<GraphRow> data = new ArrayList<MyWebActivity.GraphRow>(records.size());
+        ArrayList<GraphRow> data = new ArrayList<WebMemoryActivity.GraphRow>(records.size());
         for (MemoryRecord record : records) {
             GraphRow row = new GraphRow();
             row.date = dateFormat.format(record.time);

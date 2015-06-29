@@ -26,7 +26,7 @@ import com.d.localdb.BatteryRecord;
 import com.d.localdb.LocalDB;
 import com.d.utility.BatteryInfoCollector;
 
-public class BatteryControllerActivity extends MyWebActivity {
+public class BatteryControllerActivity extends WebBatteryActivity {
 
 	BatteryInfoCollector bctr;
 	private TextView tv;

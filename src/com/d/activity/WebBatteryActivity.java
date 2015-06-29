@@ -20,7 +20,7 @@ import com.d.localdb.BatteryRecord;
 import com.d.localdb.LocalDB;
 import com.google.gson.Gson;
 
-public class MyWebActivity extends Activity {
+public class WebBatteryActivity extends Activity {
    
     public String getAssetAsString(String path) throws IOException {
         StringBuilder buf = new StringBuilder();
@@ -50,7 +50,7 @@ public class MyWebActivity extends Activity {
         Information(){
         	yaxisDesc = yaxisName;
         }
-        ArrayList<GraphRow> data = new ArrayList<MyWebActivity.GraphRow>();
+        ArrayList<GraphRow> data = new ArrayList<WebBatteryActivity.GraphRow>();
     }
     protected SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
     public class JSInterface {
@@ -80,7 +80,7 @@ public class MyWebActivity extends Activity {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_MONTH, -1);
         List<BatteryRecord> records = ldb.getAll(null, cal.getTime(), null, true, 20000);
-        ArrayList<GraphRow> data = new ArrayList<MyWebActivity.GraphRow>(records.size());
+        ArrayList<GraphRow> data = new ArrayList<WebBatteryActivity.GraphRow>(records.size());
         for (BatteryRecord record : records) {
             GraphRow row = new GraphRow();
             row.date = dateFormat.format(record.time);
