@@ -16,36 +16,62 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
+import android.widget.TabHost;
 import android.widget.TextView;
+import android.widget.TabHost.TabSpec;
 
 import com.d.activity.WebBatteryActivity.JSInterface;
 import com.d.localdb.AppUsageRecord;
 import com.d.localdb.BatteryRecord;
 import com.d.localdb.LocalDB;
+import com.d.utility.AppUsageCollector;
 
 public class AppUsageActivity extends WebAppUsageActivity {
 	private static SimpleDateFormat dateFormat = new SimpleDateFormat(
 			"HH:mm:ss", Locale.getDefault());
-	private int display_num;
+	
+	AppUsageCollector auc;
 	private Handler handler;
 	// CollectorMain collector;
 	//LocalDB ldb_usage;
 	private TextView tv;
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_app_usage);
-		tv = new TextView(this);
-		handler = new Handler();
-		String output = "";
-		tv.setText(output);
-		setContentView(tv);
-		tv.setMovementMethod(new ScrollingMovementMethod());
-
-		
+		setContentView(R.layout.activity_battery);
 		ldb = new LocalDB(getBaseContext(), AppUsageRecord.TABLE);
 		yaxisName = "AppPackageName";
+		handler = new Handler();
+		
+		TabHost tabhost = (TabHost) findViewById(android.R.id.tabhost);
+	    tabhost.setup();
+	    TabSpec ts = tabhost.newTabSpec("tag1"); 
+	    ts.setContent(R.id.graph);
+	    ts.setIndicator("App Usage Graph");
+	    tabhost.addTab(ts);
+
+	    ts = tabhost.newTabSpec("tag2"); 
+	    ts.setContent(R.id.present);
+	    ts.setIndicator("App Log");  
+	    tabhost.addTab(ts);
+	    
+		
+	    tv = (TextView) findViewById(R.id.text);
+		webview =  (WebView) findViewById(R.id.webview_battery);
+		
+		
+		
+
+		webview.loadUrl("file:///android_asset/html/appUsage.html");
+		webview.getSettings().setJavaScriptEnabled(true);
+		webview.getSettings().setDomStorageEnabled(true);
+		webview.getSettings().setLoadWithOverviewMode(true);
+		webview.addJavascriptInterface(new JSInterface(), "Android");
+		
+		
+		
 		handler.post(new Runnable() {
 
 			@Override
@@ -72,14 +98,7 @@ public class AppUsageActivity extends WebAppUsageActivity {
 		});
 		/*View webViewLayout = ((LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE))
 	            .inflate(R.layout.activity_app_usage, null, false);*/
-		webview =  (WebView) /*webViewLayout.*/findViewById(R.id.webview_appUsage);//webView is NULL?
-		
-			
 
-		webview.loadUrl("file:///android_asset/html/appUsage.html");
-		webview.getSettings().setJavaScriptEnabled(true);
-		webview.getSettings().setDomStorageEnabled(true);
-		webview.getSettings().setLoadWithOverviewMode(true);
 		
 		/*try {
 			webview.loadDataWithBaseURL("file:///android_asset/",
@@ -90,7 +109,7 @@ public class AppUsageActivity extends WebAppUsageActivity {
 			e.printStackTrace();
 		}
 		*/
-		webview.addJavascriptInterface(new JSInterface(), "Android");
+		
 
 	}
 
