@@ -70,12 +70,13 @@ public class AppUsageActivity extends WebAppUsageActivity {
 				handler.postDelayed(this, 500); // set time here to refresh
 			}
 		});
-		View webViewLayout = ((LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-	            .inflate(R.layout.activity_app_usage, null, false);
-		webview =  (WebView) webViewLayout.findViewById(R.id.webview_appUsage);//webView is NULL?
+		/*View webViewLayout = ((LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+	            .inflate(R.layout.activity_app_usage, null, false);*/
+		webview =  (WebView) /*webViewLayout.*/findViewById(R.id.webview_appUsage);//webView is NULL?
 		
 			
 
+		webview.loadUrl("file:///android_asset/html/appUsage.html");
 		webview.getSettings().setJavaScriptEnabled(true);
 		webview.getSettings().setDomStorageEnabled(true);
 		webview.getSettings().setLoadWithOverviewMode(true);
@@ -84,7 +85,6 @@ public class AppUsageActivity extends WebAppUsageActivity {
 			webview.loadDataWithBaseURL("file:///android_asset/",
 					getAssetAsString("html/appUsage.html"),
 					"text/html; charset=utf-8", null, null);*/
-			webview.loadUrl("file:///android_asset/html/appUsage.html");
 		
 		/*} catch (IOException e) {
 			e.printStackTrace();

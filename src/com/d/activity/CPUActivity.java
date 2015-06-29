@@ -13,20 +13,14 @@ import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.TabHost.TabSpec;
 
-import com.d.activity.WebBatteryActivity.GraphRow;
-import com.d.activity.WebBatteryActivity.Information;
-import com.d.activity.WebBatteryActivity.JSInterface;
-import com.d.localdb.BatteryRecord;
 import com.d.localdb.CPURecord;
 import com.d.localdb.LocalDB;
-import com.d.localdb.MemoryRecord;
-import com.d.utility.BatteryInfoCollector;
-import com.d.utility.MemoryUsageCollector;
+import com.d.utility.CpuUsageCollector;
 
 public class CPUActivity extends WebCPUActivity {
 
 
-	MemoryUsageCollector muc;
+	CpuUsageCollector cuc;
 	private TextView tv;
 	private Handler handler;
 	
@@ -36,7 +30,7 @@ public class CPUActivity extends WebCPUActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_battery);
-		ldb = new LocalDB(getBaseContext(), MemoryRecord.TABLE);
+		ldb = new LocalDB(getBaseContext(), CPURecord.TABLE);
 		yaxisName = "CPU (%)";
 		handler = new Handler();
 		
@@ -56,13 +50,14 @@ public class CPUActivity extends WebCPUActivity {
 		tv = (TextView) findViewById(R.id.text);
 		webview =  (WebView) findViewById(R.id.webview_battery);
 	
-		try {
+		/*try {
 			webview.loadDataWithBaseURL("file:///android_asset/",
 					getAssetAsString("html/cpu.html"),
 					"text/html; charset=utf-8", null, null);
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		}*/
+		webview.loadUrl("file:///android_asset/html/cpu.html");
 		webview.getSettings().setJavaScriptEnabled(true);
 		webview.getSettings().setDomStorageEnabled(true);
 		webview.getSettings().setLoadWithOverviewMode(true);
