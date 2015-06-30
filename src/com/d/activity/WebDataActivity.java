@@ -17,8 +17,9 @@ import android.view.ViewGroup.LayoutParams;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 
-import com.d.api.AppUsage;
-import com.d.localdb.AppUsageRecord;
+import com.d.localdb.DataUsageRecord;
+import com.d.localdb.LocalDB;
+import com.d.localdb.MemoryRecord;
 import com.google.gson.Gson;
 
 public class WebDataActivity extends Activity {
@@ -43,9 +44,9 @@ public class WebDataActivity extends Activity {
     
     public static String yaxisName;
     public static class GraphRow {
-        public String startTime;
-        public Long elapsedTime;
-        public String name;
+    	public String date;
+        public Long transdata;
+        public Long recdata;
     }
     public static class Information {
         public String yaxisDesc;
@@ -68,7 +69,7 @@ public class WebDataActivity extends Activity {
     }
 
     protected WebView webview;
-    protected AppUsage au;
+    protected LocalDB ldb;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
      
@@ -81,16 +82,13 @@ public class WebDataActivity extends Activity {
         Information info = new Information();
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_MONTH, -1);
-        au = new AppUsage(getBaseContext());
-        
-        List<AppUsageRecord> records = au.getRecords(20000);
-        
+        List<DataUsageRecord> records = ldb.getAll(null, cal.getTime(), null, true, 20000);
         ArrayList<GraphRow> data = new ArrayList<WebDataActivity.GraphRow>(records.size());
-        for (AppUsageRecord record : records) {
+        for (DataUsageRecord record : records) {
             GraphRow row = new GraphRow();
-            row.startTime = dateFormat.format(record.startTime);
-            row.elapsedTime = record.elapsedTime;
-            row.name = record.packageName;
+            row.date = dateFormat.format(record.time);
+            row.transdata = record.trans_data;
+            row.recdata = record.rec_data;
             data.add(row);
         }
         info.data = data;
