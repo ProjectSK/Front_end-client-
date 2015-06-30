@@ -16,7 +16,7 @@ import com.d.utility.BatteryInfoCollector;
 
 public class BatteryControllerActivity extends MyWebActivity {
 
-	BatteryInfoCollector bctr;
+	BatteryInfoCollector bic;
 	private TextView tv;
 	private Handler handler;
 	
@@ -25,12 +25,13 @@ public class BatteryControllerActivity extends MyWebActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_battery);
-		ldb = new LocalDB(getBaseContext(), BatteryRecord.TABLE);
 		yaxisName = "Battery (%)";
-		
-		handler = new Handler();
 		ldb = new LocalDB(getBaseContext(), BatteryRecord.TABLE);
+		handler = new Handler();
+		bic = new BatteryInfoCollector(getBaseContext());
+		
+		
+		setContentView(R.layout.activity_battery);
 		
 		TabHost tabhost = (TabHost) findViewById(android.R.id.tabhost);
 	    tabhost.setup();
@@ -64,8 +65,10 @@ public class BatteryControllerActivity extends MyWebActivity {
 
 			@Override
 			public void run() {
-				List<BatteryRecord> elements = ldb.getAll(null, null, null, true, 1);
 
+				registerReceiver(bic.bcr, bic.filter);
+				List<BatteryRecord> elements = ldb.getAll(null, null, null, true, 1);
+				
 				String batteryInfoMessage = "";
 				for (BatteryRecord record : elements) {								
 					batteryInfoMessage += "Battery Voltage : " + record.voltage + "mV\n";
@@ -77,10 +80,10 @@ public class BatteryControllerActivity extends MyWebActivity {
 					batteryInfoMessage += "Battery Capacity : " + record.capacity + "%\n";
 					
 				}
+				
 				tv.setText(batteryInfoMessage);
 				tv.invalidate();
-
-				handler.postDelayed(this, 5 * 1000); // set time here to refresh
+				handler.postDelayed(this, bic.batteryCalculator()); // set time here to refresh
 			}
 		});
 

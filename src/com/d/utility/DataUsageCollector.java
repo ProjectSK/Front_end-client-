@@ -1,6 +1,7 @@
 package com.d.utility;
 
 import java.util.Date;
+import java.util.List;
 
 import com.d.localdb.AppUsageRecord;
 import com.d.localdb.DataUsageRecord;
@@ -37,20 +38,33 @@ public class DataUsageCollector {
 		long rec;
 		locdb = new LocalDB(context, DataUsageRecord.TABLE);
 		try {
-			DataUsageRecord record;
-			record = locdb.getAll(new DataUsageRecord(), null , null , true , 1).get(0);
+			DataUsageRecord record = null;
+			boolean dbRecordUsable = false;
+			
+			
+			List<DataUsageRecord> getRecords = locdb.getAll(new DataUsageRecord(), null , null , true , 1);
 			Date deviceBootTime = new Date(System.currentTimeMillis() - android.os.SystemClock.elapsedRealtime());
-			if(record.time.after(deviceBootTime)){
+			
+			if(getRecords.size() !=0){	//null check
+				record = getRecords.get(0);
+				if(record.time.after(deviceBootTime)){
+					dbRecordUsable = true;
+				}
+			}
+			if(dbRecordUsable){
 				trans = record.trans_data;
 				rec = record.rec_data;
 				previous = new Log(trans, rec);
 				previous.time = record.time.getTime();
+				previous.elapsed_time = record.elapsed_time;
 			}
 			else {
 				trans = TrafficStats.getMobileTxBytes();
 				rec = TrafficStats.getMobileRxBytes();
+				previous = new Log(trans, rec);
 				previous.elapsed_time = android.os.SystemClock.elapsedRealtime();
 			}
+			
 			
 		} finally {
 			locdb.close();
