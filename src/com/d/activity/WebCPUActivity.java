@@ -16,11 +16,13 @@ import android.os.Bundle;
 import android.view.ViewGroup.LayoutParams;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
+
 import com.d.localdb.BatteryRecord;
+import com.d.localdb.CPURecord;
 import com.d.localdb.LocalDB;
 import com.google.gson.Gson;
 
-public class MyWebActivity extends Activity {
+public class WebCPUActivity extends Activity {
    
     public String getAssetAsString(String path) throws IOException {
         StringBuilder buf = new StringBuilder();
@@ -43,14 +45,17 @@ public class MyWebActivity extends Activity {
     public static String yaxisName;
     public static class GraphRow {
         public String date;
-        public float percentage;
+		public long user;
+		public long system;
+		public long idle;
+		public long other;
     }
     public static class Information {
         public String yaxisDesc;
         Information(){
         	yaxisDesc = yaxisName;
         }
-        ArrayList<GraphRow> data = new ArrayList<MyWebActivity.GraphRow>();
+        ArrayList<GraphRow> data = new ArrayList<WebCPUActivity.GraphRow>();
     }
     protected SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
     public class JSInterface {
@@ -79,12 +84,15 @@ public class MyWebActivity extends Activity {
         Information info = new Information();
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_MONTH, -1);
-        List<BatteryRecord> records = ldb.getAll(null, cal.getTime(), null, true, 20000);
-        ArrayList<GraphRow> data = new ArrayList<MyWebActivity.GraphRow>(records.size());
-        for (BatteryRecord record : records) {
+        List<CPURecord> records = ldb.getAll(null, cal.getTime(), null, true, 20000);
+        ArrayList<GraphRow> data = new ArrayList<WebCPUActivity.GraphRow>(records.size());
+        for (CPURecord record : records) {
             GraphRow row = new GraphRow();
             row.date = dateFormat.format(record.time);
-            row.percentage = (float)record.capacity;
+    		row.user = record.user;
+    		row.system=record.system;
+    		row.idle=record.idle;
+    		row.other=record.other;
             data.add(row);
         }
         info.data = data;

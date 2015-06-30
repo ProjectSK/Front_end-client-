@@ -42,9 +42,9 @@
         android:id="@+id/deleteTables"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/membtn"
-        android:layout_alignRight="@+id/membtn"
-        android:layout_below="@+id/membtn"
+        android:layout_alignLeft="@+id/cpubtn"
+        android:layout_alignRight="@+id/cpubtn"
+        android:layout_below="@+id/cpubtn"
         android:layout_marginTop="20dp"
         android:text="Stop service" />
 
@@ -56,5 +56,15 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
         android:text="Battery Controller" />
+    
+    <Button
+        android:id="@+id/cpubtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/membtn"
+        android:layout_alignRight="@+id/membtn"
+        android:layout_below="@+id/membtn"
+        android:layout_marginTop="20dp"
+        android:text="CPU" />
 
 </RelativeLayout>

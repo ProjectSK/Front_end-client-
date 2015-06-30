@@ -13,16 +13,13 @@ import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.TabHost.TabSpec;
 
-import com.d.activity.MyWebActivity.GraphRow;
-import com.d.activity.MyWebActivity.Information;
-import com.d.activity.MyWebActivity.JSInterface;
 import com.d.localdb.BatteryRecord;
 import com.d.localdb.LocalDB;
 import com.d.localdb.MemoryRecord;
 import com.d.utility.BatteryInfoCollector;
 import com.d.utility.MemoryUsageCollector;
 
-public class MemoryActivity extends MyWebActivity {
+public class MemoryActivity extends WebMemoryActivity {
 
 
 	MemoryUsageCollector muc;
@@ -39,7 +36,6 @@ public class MemoryActivity extends MyWebActivity {
 		yaxisName = "Memory (%)";
 		handler = new Handler();
 		
-		
 		TabHost tabhost = (TabHost) findViewById(android.R.id.tabhost);
 	    tabhost.setup();
 	    TabSpec ts = tabhost.newTabSpec("tag1"); 
@@ -53,15 +49,16 @@ public class MemoryActivity extends MyWebActivity {
 	    tabhost.addTab(ts);
 		
 		tv = (TextView) findViewById(R.id.text);
-		webview =  (WebView) findViewById(R.id.webview);
+		webview =  (WebView) findViewById(R.id.webview_battery);
 	
-		try {
+		/*try {
 			webview.loadDataWithBaseURL("file:///android_asset/",
-					getAssetAsString("html/area.html"),
+					getAssetAsString("html/memory.html"),
 					"text/html; charset=utf-8", null, null);
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		}*/
+		webview.loadUrl("file:///android_asset/html/memory.html");
 		webview.getSettings().setJavaScriptEnabled(true);
 		webview.getSettings().setDomStorageEnabled(true);
 		webview.getSettings().setLoadWithOverviewMode(true);
@@ -78,7 +75,7 @@ public class MemoryActivity extends MyWebActivity {
 				for (MemoryRecord record : elements) {
 					output += record.toString() + "\n";
 				}
-				Log.d("memoryActivity", output);
+				//Log.d("memoryActivity", output);
 				tv.setText(output);
 				tv.invalidate();
 
@@ -94,22 +91,5 @@ public class MemoryActivity extends MyWebActivity {
 		super.onDestroy();
 		handler.removeMessages(0);
 		ldb.close();
-	}
-	
-	@Override
-	protected Information getInformation() {
-        Information info = new Information();
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_MONTH, -1);
-        List<MemoryRecord> records = ldb.getAll(null, cal.getTime(), null, true, 20000);
-        ArrayList<GraphRow> data = new ArrayList<MyWebActivity.GraphRow>(records.size());
-        for (MemoryRecord record : records) {
-            GraphRow row = new GraphRow();
-            row.date = dateFormat.format(record.time);
-            row.percentage = (float)record.percentageOfMemoryUsage;
-            data.add(row);
-        }
-        info.data = data;
-        return info;
-	}
+	}	
 }

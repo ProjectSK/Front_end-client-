@@ -64,9 +64,9 @@ body {
         .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  //  var test = document.getElementById('test');
-    
-    var info = JSON.parse(Android.info());
+   // var test = document.getElementById('test');
+   
+    var info = JSON.parse(Android.info())
     var yaxisDesc = info.yaxisDesc;
     var data = info.data;
 
@@ -86,8 +86,8 @@ body {
                 });
 
     x.domain(d3.extent(data, function(d) { return d.date; }));
-    y.domain([0,100]);
-//    y.domain([d3.min(data, function(d) { return d.capacity; }),d3.max(data, function(d) { return d.capacity; })]);
+    //y.domain([0,100]);
+    y.domain([d3.min(data, function(d) { return d.user; }),d3.max(data, function(d) { return d.user; })]);
     svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
@@ -127,7 +127,7 @@ body {
         .text(function(d) { return d.name; })
         .style('fill', function(d){return color(d.name);});
 
-    //    document.getElementById('test').innerHTML += color + color.domain()
+        //document.getElementById('test').innerHTML += color + color.domain()
 
 </script>
 </body>

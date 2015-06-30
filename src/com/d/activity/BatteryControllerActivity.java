@@ -14,7 +14,7 @@ import com.d.localdb.BatteryRecord;
 import com.d.localdb.LocalDB;
 import com.d.utility.BatteryInfoCollector;
 
-public class BatteryControllerActivity extends MyWebActivity {
+public class BatteryControllerActivity extends WebBatteryActivity  {
 
 	BatteryInfoCollector bic;
 	private TextView tv;
@@ -29,7 +29,6 @@ public class BatteryControllerActivity extends MyWebActivity {
 		ldb = new LocalDB(getBaseContext(), BatteryRecord.TABLE);
 		handler = new Handler();
 		bic = new BatteryInfoCollector(getBaseContext());
-		
 		
 		setContentView(R.layout.activity_battery);
 		
@@ -46,15 +45,16 @@ public class BatteryControllerActivity extends MyWebActivity {
 	    tabhost.addTab(ts);
 		
 		tv = (TextView) findViewById(R.id.text);
-		webview =  (WebView) findViewById(R.id.webview);
+		webview =  (WebView) findViewById(R.id.webview_battery);
 	
-		try {
+		/*try {
 			webview.loadDataWithBaseURL("file:///android_asset/",
-					getAssetAsString("html/area.html"),
+					getAssetAsString("html/battery.html"),
 					"text/html; charset=utf-8", null, null);
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		}*/
+		webview.loadUrl("file:///android_asset/html/battery.html");
 		webview.getSettings().setJavaScriptEnabled(true);
 		webview.getSettings().setDomStorageEnabled(true);
 		webview.getSettings().setLoadWithOverviewMode(true);
@@ -74,7 +74,7 @@ public class BatteryControllerActivity extends MyWebActivity {
 					batteryInfoMessage += "Battery Voltage : " + record.voltage + "mV\n";
 					batteryInfoMessage += "Battery Level : " + record.level + "\n";
 					batteryInfoMessage += "Battery Scale : " + record.scale + "\n";
-					batteryInfoMessage += "Battery Temperature : " + record.temperature + "¢ªC\n";
+					batteryInfoMessage += "Battery Temperature : " + record.temperature + "ï¿½ï¿½C\n";
 					batteryInfoMessage += "Battery Plug Type : " + record.plugType + "\n";
 					batteryInfoMessage += "Battery Health Type : " + record.healthType + "\n";
 					batteryInfoMessage += "Battery Capacity : " + record.capacity + "%\n";
