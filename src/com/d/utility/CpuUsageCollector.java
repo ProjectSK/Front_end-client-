@@ -7,35 +7,36 @@ import java.util.Calendar;
 
 import com.d.activity.R.id;
 import com.d.localdb.CPURecord;
+import com.d.localdb.LocalDB;
 import com.d.localdb.MemoryRecord;
 
+import android.content.Context;
 import android.util.Log;
 
 public class CpuUsageCollector {
-	
-	public Long user;
-	public Long system;
-	public Long idle;
-	public Long other;
-	
-	public CpuUsageCollector() {
 
+	private Long user;
+	private Long system;
+	private Long idle;
+	private Long other;
+	private Context context;
+
+	public CpuUsageCollector(Context context) {
+		this.context = context;
 		long[] update = getCpuUsageStatistic();
-		if(update.length == 4){
+		if (update.length == 4) {
 			user = update[0];
 			system = update[1];
 			idle = update[2];
 			other = update[3];
-		}
-		else {
+		} else {
 			user = 0l;
 			system = 0l;
 			idle = 0l;
 			other = 0l;
 		}
 	}
-	
-	
+
 	/**
 	 * 
 	 * @return integer Array with 4 elements: user, system, idle and other cpu
@@ -90,16 +91,31 @@ public class CpuUsageCollector {
 		}
 		return returnString;
 	}
-	public CPURecord getRecord(){
+
+	private CPURecord getRecord() {
 		long[] update = getCpuUsageStatistic();
-		if(update.length == 4){
+		if (update.length == 4) {
 			user = update[0];
 			system = update[1];
 			idle = update[2];
 			other = update[3];
-			return new CPURecord(Calendar.getInstance().getTime(),user,system,idle,other);
+			return new CPURecord(Calendar.getInstance().getTime(), user,
+					system, idle, other);
 		}
 		return null;
+	}
+
+	public void saveRecord() {
+		LocalDB ldb_cpu = new LocalDB(context, CPURecord.TABLE);
+		try {
+
+			CPURecord record = getRecord();
+			if (record != null) {
+				ldb_cpu.addRecord(record);
+			}
+		} finally {
+			ldb_cpu.close();
+		}
 	}
 
 }

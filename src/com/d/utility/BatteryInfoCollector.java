@@ -1,24 +1,28 @@
 package com.d.utility;
 
+import java.io.ObjectInputStream.GetField;
 import java.util.Calendar;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.BatteryManager;
+import android.util.Log;
+import android.view.LayoutInflater.Filter;
 
 import com.d.localdb.BatteryRecord;
+import com.d.localdb.LocalDB;
 
 public class BatteryInfoCollector {
 
 	private BatteryManager batteryManager;
 
-	private BroadcastReceiver bcr = new BroadcastReceiver() {
-		int count = 0;
+	public BroadcastReceiver bcr = new BroadcastReceiver() {
 
 		public void onReceive(Context context, Intent intent) {
 			String action = intent.getAction();
-			count++;
+
 			if (action.equals(Intent.ACTION_BATTERY_CHANGED)) {
 				update(intent);
 			}
@@ -50,18 +54,23 @@ public class BatteryInfoCollector {
 	private String technology;
 	private float temperature;
 	private long voltage;
+	private Context context;
+
+	public IntentFilter filter;
 
 	/**
 	 * Device의 구동시간을 10시간을 기준으로 잡고 데이터 수집 주기를 조절한다. 해당시간을 조정하고 싶다면
 	 * BatteryInfoCollector(int goaltime)을 이용한다.
 	 */
-	public BatteryInfoCollector() {
+	public BatteryInfoCollector(Context context) {
 		batteryManager = new BatteryManager();
 		goaltime = 60 * 10;
 		previousTime = System.currentTimeMillis();
 		previousRatio = 100 / (goaltime * 60 * 1000);
 		previousState = 100;
 		requestTime = 1000;
+		this.context = context;
+		setFilter();
 	}
 
 	/**
@@ -69,7 +78,7 @@ public class BatteryInfoCollector {
 	 * 
 	 * @param goaltime
 	 */
-	public BatteryInfoCollector(int goaltime) {
+	public BatteryInfoCollector(Context context, int goaltime) {
 		batteryManager = new BatteryManager();
 		this.goaltime = 60 * 10;
 		previousTime = System.currentTimeMillis();
@@ -80,6 +89,17 @@ public class BatteryInfoCollector {
 		if (isGoalInRightRange(goaltime)) {
 			this.goaltime = goaltime;
 		}
+		this.context = context;
+		setFilter();
+	}
+
+	private void setFilter() {
+		filter = new IntentFilter();
+		filter.addAction(Intent.ACTION_BATTERY_CHANGED);
+		filter.addAction(Intent.ACTION_BATTERY_LOW);
+		filter.addAction(Intent.ACTION_BATTERY_OKAY);
+		filter.addAction(Intent.ACTION_POWER_CONNECTED);
+		filter.addAction(Intent.ACTION_POWER_DISCONNECTED);
 	}
 
 	/**
@@ -147,11 +167,12 @@ public class BatteryInfoCollector {
 	}
 
 	/**
-	 * BatteryRecord type으로 본 class의 정보들을 저장하여 return한다. 최소한 한번의
-	 * update(intent)가 시행되어야 유의미한 record값을 얻을 수 있다.
+	 * BatteryRecord type으로 본 class의 정보들을 저장하여 return한다. 최소한 한번의 update(intent)가
+	 * 시행되어야 유의미한 record값을 얻을 수 있다.
+	 * 
 	 * @return BatteryRecord
 	 */
-	public BatteryRecord getRecord() {
+	private BatteryRecord getRecord() {
 		return new BatteryRecord(Calendar.getInstance().getTime(), capacity,
 				level, scale, voltage, temperature, healthType, plugType);
 	}
@@ -186,11 +207,24 @@ public class BatteryInfoCollector {
 		return batteryInfoMessage;
 	}
 
+	public void saveRecord() {
+		LocalDB ldb_bat = new LocalDB(context, BatteryRecord.TABLE);
+		try {
+			BatteryRecord record = getRecord();
+			if (record != null)
+				ldb_bat.addRecord(record);
+		} finally {
+			ldb_bat.close();
+		}
+	}
+
 	/**
 	 * 본 class의 정보를 update한다.
-	 * @param intent battery 정보를 포함하는 intent가 필요하다. (eg. system intent)
+	 * 
+	 * @param intent
+	 *            battery 정보를 포함하는 intent가 필요하다. (eg. system intent)
 	 */
-	public void update(Intent intent) {
+	private void update(Intent intent) {
 		int plug = intent.getIntExtra("plugged", 0);
 		level = intent.getIntExtra("level", 0);
 		scale = intent.getIntExtra("scale", 100);

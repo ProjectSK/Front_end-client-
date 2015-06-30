@@ -3,32 +3,20 @@ package com.d.activity;
 import java.io.IOException;
 import java.util.List;
 
-import android.app.Activity;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.IntentFilter.MalformedMimeTypeException;
-import android.nfc.tech.NfcF;
-import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
-import android.view.ViewGroup.LayoutParams;
 import android.webkit.WebView;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 
-import com.d.localdb.AppUsageRecord;
 import com.d.localdb.BatteryRecord;
 import com.d.localdb.LocalDB;
 import com.d.utility.BatteryInfoCollector;
 
 public class BatteryControllerActivity extends MyWebActivity {
 
-	BatteryInfoCollector bctr;
+	BatteryInfoCollector bic;
 	private TextView tv;
 	private Handler handler;
 	
@@ -37,12 +25,13 @@ public class BatteryControllerActivity extends MyWebActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_battery);
-		ldb = new LocalDB(getBaseContext(), BatteryRecord.TABLE);
 		yaxisName = "Battery (%)";
-		
-		handler = new Handler();
 		ldb = new LocalDB(getBaseContext(), BatteryRecord.TABLE);
+		handler = new Handler();
+		bic = new BatteryInfoCollector(getBaseContext());
+		
+		
+		setContentView(R.layout.activity_battery);
 		
 		TabHost tabhost = (TabHost) findViewById(android.R.id.tabhost);
 	    tabhost.setup();
@@ -76,8 +65,10 @@ public class BatteryControllerActivity extends MyWebActivity {
 
 			@Override
 			public void run() {
-				List<BatteryRecord> elements = ldb.getAll(null, null, null, true, 1);
 
+				registerReceiver(bic.bcr, bic.filter);
+				List<BatteryRecord> elements = ldb.getAll(null, null, null, true, 1);
+				
 				String batteryInfoMessage = "";
 				for (BatteryRecord record : elements) {								
 					batteryInfoMessage += "Battery Voltage : " + record.voltage + "mV\n";
@@ -89,10 +80,10 @@ public class BatteryControllerActivity extends MyWebActivity {
 					batteryInfoMessage += "Battery Capacity : " + record.capacity + "%\n";
 					
 				}
+				
 				tv.setText(batteryInfoMessage);
 				tv.invalidate();
-
-				handler.postDelayed(this, 500); // set time here to refresh
+				handler.postDelayed(this, bic.batteryCalculator()); // set time here to refresh
 			}
 		});
 
