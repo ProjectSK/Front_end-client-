@@ -57,9 +57,10 @@ public class ServiceClass extends Service {
 	private Handler handler;
 
 	// DEBUG
-	private long interval = 1000;
+	private long interval = 5000;
 	private LocationCollector lc;
 	private CpuUsageCollector cuc;
+	private DataUsageCollector duc;
 
 	private LocalDB ldb_usage, ldb_loc, ldb_bat, ldb_mem, ldb_cpu;
 
@@ -100,6 +101,7 @@ public class ServiceClass extends Service {
 		lc = new LocationCollector(getBaseContext());
 		muc = new MemoryUsageCollector(getBaseContext());
 		cuc = new CpuUsageCollector();
+		duc = new DataUsageCollector(getBaseContext());
 
 		handler = new Handler();
 		handler.post(new Runnable() {
@@ -155,6 +157,8 @@ public class ServiceClass extends Service {
 				} finally {
 					ldb_bat.close();
 				}
+				
+				duc.saveRecord();
 				
 				handler.postDelayed(this, interval); // set time here to refresh
 			}

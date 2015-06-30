@@ -92,7 +92,7 @@ public class BatteryControllerActivity extends MyWebActivity {
 				tv.setText(batteryInfoMessage);
 				tv.invalidate();
 
-				handler.postDelayed(this, 500); // set time here to refresh
+				handler.postDelayed(this, 5 * 1000); // set time here to refresh
 			}
 		});
 
