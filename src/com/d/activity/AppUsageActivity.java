@@ -19,7 +19,6 @@ import com.d.localdb.LocalDB;
 public class AppUsageActivity extends Activity {
 	private static SimpleDateFormat dateFormat = new SimpleDateFormat(
 			"HH:mm:ss", Locale.getDefault());
-	private int display_num;
 	private Handler handler;
 	// CollectorMain collector;
 	private AppUsage au;

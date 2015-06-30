@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 
+import com.d.localdb.LocalDB;
 import com.d.localdb.LocationLogRecord;
 
 public class LocationCollector implements LocationListener {
@@ -69,7 +70,7 @@ public class LocationCollector implements LocationListener {
 		return latitude;
 	}
 
-	public LocationLogRecord getLocation() {
+	private LocationLogRecord getLocation() {
 		try {
 			locationManager = (LocationManager) mContext
 					.getSystemService(Service.LOCATION_SERVICE);
@@ -127,8 +128,7 @@ public class LocationCollector implements LocationListener {
 		}
 		if (location != null)
 			return new LocationLogRecord(Calendar.getInstance().getTime(),
-					 (location.getLatitude()),
-					 (location.getLongitude()));
+					(location.getLatitude()), (location.getLongitude()));
 		return null;
 	}
 
@@ -211,6 +211,17 @@ public class LocationCollector implements LocationListener {
 	public void stopUsingGPS() {
 		if (locationManager != null) {
 			locationManager.removeUpdates(LocationCollector.this);
+		}
+	}
+
+	public void saveRecord() {
+		LocalDB ldb_loc = new LocalDB(mContext, LocationLogRecord.TABLE);
+		try {
+			LocationLogRecord record = getLocation();
+			if (record != null)
+				ldb_loc.addRecord(record);
+		} finally {
+			ldb_loc.close();
 		}
 	}
 

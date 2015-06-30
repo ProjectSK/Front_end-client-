@@ -3,25 +3,13 @@ package com.d.activity;
 import java.io.IOException;
 import java.util.List;
 
-import android.app.Activity;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.IntentFilter.MalformedMimeTypeException;
-import android.nfc.tech.NfcF;
-import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
-import android.view.ViewGroup.LayoutParams;
 import android.webkit.WebView;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 
-import com.d.localdb.AppUsageRecord;
 import com.d.localdb.BatteryRecord;
 import com.d.localdb.LocalDB;
 import com.d.utility.BatteryInfoCollector;
