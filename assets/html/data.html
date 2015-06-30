@@ -65,7 +65,7 @@ body {
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     var test = document.getElementById('test');
-
+    
 
     var info = JSON.parse(Android.info())
     var yaxisDesc = info.yaxisDesc;
@@ -76,20 +76,30 @@ body {
     data.forEach(function(d) {
             d.date = parseDate(d.date);
             });
-    
 
     var pers = color.domain().map(function(name){
             return{
                 name: name,
                 values: data.map(function(d){
-                                return {date: d.date, graphval: d.percentageUsage};
+                                return {date: d.date, graphval: +d[name]};
                                 })
                 };
                 });
 
+
     x.domain(d3.extent(data, function(d) { return d.date; }));
-    y.domain([0,100]);
-//    y.domain([d3.min(data, function(d) { return d.capacity; }),d3.max(data, function(d) { return d.percentageUsage; })]);
+    y.domain([0,0]);
+    y.domain([d3.min(data, function(d) { if(Number(d.transdata)>Number(d.recdata)){
+                return d.transdata;
+                }else{
+                return d.recdata;
+                }
+                }),d3.max(data, function(d) { if(Number(d.transdata)>Number(d.recdata)){
+                    return d.transdata;
+                    }else{
+                    return d.recdata;
+                    }
+                    })]);
     svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
@@ -107,20 +117,20 @@ body {
 
 
 
-    var percentage = svg.selectAll(".percentage")
+    var dataUsage = svg.selectAll(".data")
         .data(pers)
         .enter().append("g")
-        .attr("class", "percentageUsage");
+        .attr("class", function(d){return d.name;});
 
 
-    percentage.append("path")
+    dataUsage.append("path")
         .attr("class", "line")
         .attr("d", function(d) { return line(d.values); })
         .style("stroke", function(d) { return color(d.name); });
 
 
 
-    percentage.append("text")
+    dataUsage.append("text")
         .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
         .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.graphval) + ")"; })
         .attr("x",width-margin.right)
@@ -129,7 +139,6 @@ body {
         .text(function(d) { return d.name; })
         .style('fill', function(d){return color(d.name);});
 
-//        document.getElementById('test').innerHTML += color + color.domain()
 
 </script>
 </body>

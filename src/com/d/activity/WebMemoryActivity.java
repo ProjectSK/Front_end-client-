@@ -67,8 +67,8 @@ public class WebMemoryActivity extends Activity {
         }
     }
 
-    WebView webview;
-    LocalDB ldb;
+    protected WebView webview;
+    protected LocalDB ldb;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
      

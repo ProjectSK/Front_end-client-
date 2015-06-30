@@ -16,11 +16,13 @@ import android.os.Bundle;
 import android.view.ViewGroup.LayoutParams;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
-import com.d.localdb.BatteryRecord;
+
+import com.d.localdb.DataUsageRecord;
 import com.d.localdb.LocalDB;
+import com.d.localdb.MemoryRecord;
 import com.google.gson.Gson;
 
-public class WebBatteryActivity extends Activity {
+public class WebDataActivity extends Activity {
    
     public String getAssetAsString(String path) throws IOException {
         StringBuilder buf = new StringBuilder();
@@ -35,23 +37,23 @@ public class WebBatteryActivity extends Activity {
         String str;
         while ((str=in.readLine()) != null) {
           buf.append(str);
-        }
+        } 
         in.close();
         return buf.toString();
     }
     
     public static String yaxisName;
     public static class GraphRow {
-        public String date;
-        public float percentage;
-        public float temperature;
+    	public String date;
+        public Long transdata;
+        public Long recdata;
     }
     public static class Information {
         public String yaxisDesc;
         Information(){
         	yaxisDesc = yaxisName;
         }
-        ArrayList<GraphRow> data = new ArrayList<WebBatteryActivity.GraphRow>();
+        ArrayList<GraphRow> data = new ArrayList<WebDataActivity.GraphRow>();
     }
     protected SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
     public class JSInterface {
@@ -80,13 +82,13 @@ public class WebBatteryActivity extends Activity {
         Information info = new Information();
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_MONTH, -1);
-        List<BatteryRecord> records = ldb.getAll(null, cal.getTime(), null, true, 20000);
-        ArrayList<GraphRow> data = new ArrayList<WebBatteryActivity.GraphRow>(records.size());
-        for (BatteryRecord record : records) {
+        List<DataUsageRecord> records = ldb.getAll(null, cal.getTime(), null, true, 20000);
+        ArrayList<GraphRow> data = new ArrayList<WebDataActivity.GraphRow>(records.size());
+        for (DataUsageRecord record : records) {
             GraphRow row = new GraphRow();
             row.date = dateFormat.format(record.time);
-            row.percentage = (float)record.capacity;
-            row.temperature = (float)record.temperature;
+            row.transdata = record.trans_data;
+            row.recdata = record.rec_data;
             data.add(row);
         }
         info.data = data;
