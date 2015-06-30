@@ -41,9 +41,15 @@
         <activity android:name="BatteryControllerActivity"></activity>
         <activity android:name="AppUsageActivity"></activity>
         <activity android:name="LocationActivity"></activity>
-        <activity android:name="MyWebActivity"></activity>
         <activity android:name="MemoryActivity"></activity>
         <activity android:name="googleMapActivity"></activity>
+        <activity android:name="CPUActivity"></activity>
+        
+        
+        <activity android:name="WebAppUsageActivity"></activity>
+        <activity android:name="WebBatteryActivity"></activity>
+        <activity android:name="WebCPUActivity"></activity>
+        <activity android:name="WebMemoryActivity"></activity>
         <service android:name="com.d.utility.ServiceClass"></service>
         <service android:name="com.d.utility.SenderService"></service>
         <receiver android:name="com.d.utility.AlarmReceiver"/> 

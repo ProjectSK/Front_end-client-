@@ -3,20 +3,32 @@ package com.d.activity;
 import java.io.IOException;
 import java.util.List;
 
+import android.app.Activity;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.IntentFilter.MalformedMimeTypeException;
+import android.nfc.tech.NfcF;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
+import android.view.ViewGroup.LayoutParams;
 import android.webkit.WebView;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 
+import com.d.localdb.AppUsageRecord;
 import com.d.localdb.BatteryRecord;
 import com.d.localdb.LocalDB;
 import com.d.utility.BatteryInfoCollector;
 
-public class BatteryControllerActivity extends MyWebActivity {
+public class BatteryControllerActivity extends WebBatteryActivity {
 
-	BatteryInfoCollector bic;
+	BatteryInfoCollector bctr;
 	private TextView tv;
 	private Handler handler;
 	
@@ -25,13 +37,10 @@ public class BatteryControllerActivity extends MyWebActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		yaxisName = "Battery (%)";
-		ldb = new LocalDB(getBaseContext(), BatteryRecord.TABLE);
-		handler = new Handler();
-		bic = new BatteryInfoCollector(getBaseContext());
-		
-		
 		setContentView(R.layout.activity_battery);
+		ldb = new LocalDB(getBaseContext(), BatteryRecord.TABLE);
+		yaxisName = "Battery (%)";
+		handler = new Handler();
 		
 		TabHost tabhost = (TabHost) findViewById(android.R.id.tabhost);
 	    tabhost.setup();
@@ -46,15 +55,16 @@ public class BatteryControllerActivity extends MyWebActivity {
 	    tabhost.addTab(ts);
 		
 		tv = (TextView) findViewById(R.id.text);
-		webview =  (WebView) findViewById(R.id.webview);
+		webview =  (WebView) findViewById(R.id.webview_battery);
 	
-		try {
+		/*try {
 			webview.loadDataWithBaseURL("file:///android_asset/",
-					getAssetAsString("html/area.html"),
+					getAssetAsString("html/battery.html"),
 					"text/html; charset=utf-8", null, null);
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		}*/
+		webview.loadUrl("file:///android_asset/html/battery.html");
 		webview.getSettings().setJavaScriptEnabled(true);
 		webview.getSettings().setDomStorageEnabled(true);
 		webview.getSettings().setLoadWithOverviewMode(true);
@@ -65,25 +75,23 @@ public class BatteryControllerActivity extends MyWebActivity {
 
 			@Override
 			public void run() {
-
-				registerReceiver(bic.bcr, bic.filter);
 				List<BatteryRecord> elements = ldb.getAll(null, null, null, true, 1);
-				
+
 				String batteryInfoMessage = "";
 				for (BatteryRecord record : elements) {								
 					batteryInfoMessage += "Battery Voltage : " + record.voltage + "mV\n";
 					batteryInfoMessage += "Battery Level : " + record.level + "\n";
 					batteryInfoMessage += "Battery Scale : " + record.scale + "\n";
-					batteryInfoMessage += "Battery Temperature : " + record.temperature + "¢ªC\n";
+					batteryInfoMessage += "Battery Temperature : " + record.temperature + "ï¿½ï¿½C\n";
 					batteryInfoMessage += "Battery Plug Type : " + record.plugType + "\n";
 					batteryInfoMessage += "Battery Health Type : " + record.healthType + "\n";
 					batteryInfoMessage += "Battery Capacity : " + record.capacity + "%\n";
 					
 				}
-				
 				tv.setText(batteryInfoMessage);
 				tv.invalidate();
-				handler.postDelayed(this, bic.batteryCalculator()); // set time here to refresh
+
+				handler.postDelayed(this, 500); // set time here to refresh
 			}
 		});
 

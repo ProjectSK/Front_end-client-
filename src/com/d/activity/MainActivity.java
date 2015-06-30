@@ -44,7 +44,7 @@ public class MainActivity extends Activity {
 			return rootView;
 		}
 	}
-	Button batteryControllerBotton, appUsageActivityBotton,locbtn, stopbtn,membtn; 
+	Button batteryControllerBotton, appUsageActivityBotton,locbtn, stopbtn,membtn,cpubtn; 
 	
 	
 	
@@ -59,6 +59,7 @@ public class MainActivity extends Activity {
 		appUsageActivityBotton = (Button)findViewById(R.id.AppUsageActivity);
 		locbtn = (Button)findViewById(R.id.LocationLog);
 		membtn = (Button)findViewById(R.id.membtn);
+		cpubtn = (Button)findViewById(R.id.cpubtn);
 		stopbtn = (Button)findViewById(R.id.deleteTables);
 		
 		
@@ -71,7 +72,7 @@ public class MainActivity extends Activity {
         serviceIntent = new Intent(MainActivity.this, SenderService.class);
         startService(serviceIntent);
 
-        Log.d("main", "onStart()");
+        //Log.d("main", "onStart()");
 		
 		
 		batteryControllerBotton.setOnClickListener(new OnClickListener(){
@@ -99,6 +100,13 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent(getBaseContext(), MemoryActivity.class);
+				startActivity(intent);
+			}
+		});
+		cpubtn.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(getBaseContext(), CPUActivity.class);
 				startActivity(intent);
 			}
 		});

@@ -10,31 +10,55 @@ import android.os.Handler;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.webkit.WebView;
+import android.widget.TabHost;
+import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
+
+
 
 import com.d.api.AppUsage;
 import com.d.localdb.AppUsageRecord;
 import com.d.localdb.LocalDB;
 
-public class AppUsageActivity extends Activity {
+public class AppUsageActivity extends WebAppUsageActivity {
 	private static SimpleDateFormat dateFormat = new SimpleDateFormat(
 			"HH:mm:ss", Locale.getDefault());
 	private Handler handler;
 	// CollectorMain collector;
-	private AppUsage au;
 	private TextView tv;
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_app_usage);
-		tv = new TextView(this);
+		setContentView(R.layout.activity_battery);
+		
 		handler = new Handler();
-		String output = "";
-		tv.setText(output);
-		setContentView(tv);
-		tv.setMovementMethod(new ScrollingMovementMethod());
+		yaxisName = "AppPackageName";
+		
+		TabHost tabhost = (TabHost) findViewById(android.R.id.tabhost);
+	    tabhost.setup();
+	    TabSpec ts = tabhost.newTabSpec("tag1"); 
+	    ts.setContent(R.id.graph);
+	    ts.setIndicator("App Usage Graph");
+	    tabhost.addTab(ts);
 
+	    ts = tabhost.newTabSpec("tag2"); 
+	    ts.setContent(R.id.present);
+	    ts.setIndicator("App Log");  
+	    tabhost.addTab(ts);
+	    
+	    tv = (TextView) findViewById(R.id.text);
+
+	    webview = (WebView) findViewById(R.id.webview_battery);	
+		webview.loadUrl("file:///android_asset/html/appUsage.html");
+		webview.getSettings().setJavaScriptEnabled(true);
+		webview.getSettings().setDomStorageEnabled(true);
+		webview.getSettings().setLoadWithOverviewMode(true);
+		webview.addJavascriptInterface(new JSInterface(), "Android");
+		
+		
 		au = new AppUsage(getBaseContext());
 		handler.post(new Runnable() {
 
