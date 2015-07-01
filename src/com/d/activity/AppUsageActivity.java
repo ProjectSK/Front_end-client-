@@ -50,7 +50,7 @@ public class AppUsageActivity extends WebAppUsageActivity {
 	    
 		
 	    tv = (TextView) findViewById(R.id.text);
-		webview =  (WebView) findViewById(R.id.webview_battery);
+		webview =  (WebView) findViewById(R.id.webview_graph);
 		
 		
 		

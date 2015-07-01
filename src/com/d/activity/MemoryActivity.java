@@ -49,7 +49,7 @@ public class MemoryActivity extends WebMemoryActivity {
 	    tabhost.addTab(ts);
 		
 		tv = (TextView) findViewById(R.id.text);
-		webview =  (WebView) findViewById(R.id.webview_battery);
+		webview =  (WebView) findViewById(R.id.webview_graph);
 	
 		/*try {
 			webview.loadDataWithBaseURL("file:///android_asset/",
