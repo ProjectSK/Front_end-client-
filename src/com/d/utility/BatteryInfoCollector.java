@@ -82,10 +82,9 @@ public class BatteryInfoCollector {
 		batteryManager = new BatteryManager();
 		this.goaltime = 60 * 10;
 		previousTime = System.currentTimeMillis();
-		;
 		previousRatio = 100 / (goaltime * 60 * 1000);
-		previousState = 100;
-		requestTime = 1000;
+		previousState = 0;
+		requestTime = 5000;
 		if (isGoalInRightRange(goaltime)) {
 			this.goaltime = goaltime;
 		}
@@ -115,6 +114,10 @@ public class BatteryInfoCollector {
 		double goalRatio = 100.0 / (goaltime * 60 * 1000);
 		double alpha = 0.5;
 		double rate = 1.0;
+		
+		/*
+		 *  지수이동평균
+		 */
 
 		presentRatio = (double) (presentState - previousState)
 				/ (presentTime - previousTime);
@@ -129,7 +132,7 @@ public class BatteryInfoCollector {
 		previousState = presentState;
 
 		requestTime = (requestTime < 1000) ? 1000 : requestTime;
-		requestTime = (requestTime > 60000) ? 60000 : requestTime;
+		requestTime = (requestTime > 30000) ? 30000 : requestTime;
 
 		return requestTime;
 
