@@ -53,6 +53,7 @@ body {
         .scale(y)
         .orient("left");
          
+  //set line
     var line = d3.svg.line()
         .interpolate("linear")
         .x(function(d) { return x(d.date); })
@@ -64,19 +65,22 @@ body {
         .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    var test = document.getElementById('test');
+//    var test = document.getElementById('test');
 
-
+	//get info from JSInterface
     var info = JSON.parse(Android.info())
     var yaxisDesc = info.yaxisDesc;
     var data = info.data;
 
+  	//set color domain as informations except date
     color.domain(d3.keys(data[0]).filter(function(key) { return key !== "date"; }));
 
+  	//parse data
     data.forEach(function(d) {
             d.date = parseDate(d.date);
             });
 
+  	//map the color of informations
     var pers = color.domain().map(function(name){
             return{
                 name: name,
@@ -86,14 +90,17 @@ body {
                 };
                 });
 
+  	//set domain of x,y axis
     x.domain(d3.extent(data, function(d) { return d.date; }));
     y.domain([0,100]);
 //    y.domain([d3.min(data, function(d) { return d.capacity; }),d3.max(data, function(d) { return d.capacity; })]);
+
+
+	//draw x, y axis
     svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
-        .call(xAxis)
-        
+        .call(xAxis)        
     svg.append("g")
         .attr("class", "y axis")
         .call(yAxis)
@@ -105,20 +112,20 @@ body {
         .text(yaxisDesc);
 
 
-
+	//set cpu var
     var cpu = svg.selectAll(".cpu")
         .data(pers)
         .enter().append("g")
         .attr("class", function(d){return d.name});
 
-
+	//draw actual line of graph
     cpu.append("path")
         .attr("class", "line")
         .attr("d", function(d) { return line(d.values); })
         .style("stroke", function(d) { return color(d.name); });
 
 
-
+	//write name next to graphline
     cpu.append("text")
         .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
         .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.graphval) + ")"; })

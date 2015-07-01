@@ -53,6 +53,7 @@ body {
         .scale(y)
         .orient("left");
          
+    //set line
     var line = d3.svg.line()
         .interpolate("linear")
         .x(function(d) { return x(d.date); })
@@ -64,21 +65,22 @@ body {
         .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    var test = document.getElementById('test');
+    //var test = document.getElementById('test');
     
-
+	//get info from JSInterface
     var info = JSON.parse(Android.info())
     var yaxisDesc = info.yaxisDesc;
     var data = info.data;
     var len = data.length;
 
-
+	//set color domain with transdata and recdata
     color.domain(d3.keys(data[0]).filter(function(key) { return key !== "date"||"elapsedTime"; }));
 
+	//parse date
     data.forEach(function(d){
             d.date=parseDate(d.date);
             });
-
+	//make information as accumulated data
     for(var i=len-2;i>=0;i--){
         var t = Number(data[i].transdata)+Number(data[i+1].transdata);
         var r = Number(data[i].recdata)+Number(data[i+1].recdata);
@@ -87,7 +89,7 @@ body {
     }
 
 
-
+	//map colors with data
     var pers = color.domain().map(function(name){
             return{
                 name: name,
@@ -99,7 +101,7 @@ body {
 
 
 
-
+	//set axis of data
     x.domain(d3.extent(data, function(d) { return d.date; }));
     y.domain([d3.min(data, function(d) { if(Number(d.transdata)>Number(d.recdata)){
                 return d.transdata;
@@ -113,11 +115,11 @@ body {
                     }
                     })]);
 
+    //draw x, y axis
     svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis)
-        
     svg.append("g")
         .attr("class", "y axis")
         .call(yAxis)
@@ -129,19 +131,20 @@ body {
         .text(yaxisDesc);
 
 
+    
     var dataUsage = svg.selectAll(".data")
         .data(pers)
         .enter().append("g")
         .attr("class", function(d){return d.name;});
 
-
+	//draw actual graph of data
     dataUsage.append("path")
         .attr("class", "line")
         .attr("d", function(d) { return line(d.values); })
         .style("stroke", function(d) { return color(d.name); });
 
 
-
+	//write name of graphline
     dataUsage.append("text")
         .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
         .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.graphval) + ")"; })

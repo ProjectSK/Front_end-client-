@@ -53,8 +53,10 @@
         .scale(y)
         .orient("left");
 
+    //set color
     var color = d3.scale.category10();
 
+    //set div "viz" as a graph output div
     var svg = d3.select("#viz").append("svg")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
@@ -63,21 +65,22 @@
 
    
 
-    var test = document.getElementById('test')
+    //var test = document.getElementById('test')
 
-
+	//get info form JSInterface class
     var info = JSON.parse(Android.info())
     var yaxisDesc = info.yaxisDesc;
     var data = info.data;
 
-
+	//calculate starting time and end time
     data.forEach(function(d){
             var oldtime =new Date(d.startTime);
             var newtime = new Date(oldtime.getTime()+Number(d.elapsedTime));
             d.startTime = parseDate(d.startTime);
             d.elapsedTime = newtime;
             });
-
+            
+	//add a fake information to set domain of x axis correctly
     var obj =d3.max(data,function(d){
         return d.elapsedTime;
         });
@@ -87,23 +90,23 @@
             return obj.name;
             });
 
+    //set color domain as packageNames
     var unique = packageName.filter(function(elem, index, self) {
                 return index == self.indexOf(elem);
                 })
-
     color.domain(unique);
 
 
-
+	//set x, y axis domain
     x.domain(d3.extent(data, function(d){return d.startTime;}));
     y.domain(data.map(function(d) { return d.name; }));
 
+    
+	//draw each axis    
     svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis);
-
-
     svg.append("g")
         .attr("class", "y axis")
         .call(yAxis)
@@ -114,7 +117,8 @@
         .style("text-anchor", "end")
         .text(yaxisDesc);
 
-
+	
+    //draw a graph
     svg.selectAll(".bar")
         .data(data)
     .enter().append("rect")
