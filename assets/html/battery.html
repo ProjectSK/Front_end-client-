@@ -33,7 +33,7 @@ body {
 <script type="text/javascript">
     var margin = {top: 20, right: 80, bottom: 30, left: 50},
         width = 960 - margin.left - margin.right,
-        height = 500 - margin.top - margin.bottom;
+        height = 700 - margin.top - margin.bottom;
 
     var parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse;
 
@@ -64,9 +64,9 @@ body {
         .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    var test = document.getElementById('test');
+  //  var test = document.getElementById('test');
     
-    var info = JSON.parse(Android.info())
+    var info = JSON.parse(Android.info());
     var yaxisDesc = info.yaxisDesc;
     var data = info.data;
 
@@ -105,20 +105,20 @@ body {
 
 
 
-    var graphline = svg.selectAll(".graphline")
+    var city = svg.selectAll(".city")
         .data(pers)
         .enter().append("g")
-        .attr("class", function(d){return d.name;});
+        .attr("class", "city");
 
 
-    graphline.append("path")
+    city.append("path")
         .attr("class", "line")
         .attr("d", function(d) { return line(d.values); })
         .style("stroke", function(d) { return color(d.name); });
 
 
 
-    graphline.append("text")
+    city.append("text")
         .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
         .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.graphval) + ")"; })
         .attr("x",width-margin.right)
@@ -127,6 +127,7 @@ body {
         .text(function(d) { return d.name; })
         .style('fill', function(d){return color(d.name);});
 
+    //    document.getElementById('test').innerHTML += color + color.domain()
 
 </script>
 </body>

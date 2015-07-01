@@ -17,7 +17,6 @@ import com.d.httpmodule.CanonicalGY;
 import com.d.localdb.AppUsageRecord;
 import com.d.localdb.BatteryRecord;
 import com.d.localdb.CPURecord;
-import com.d.localdb.DataUsageRecord;
 import com.d.localdb.LocalDB;
 import com.d.localdb.LocationLogRecord;
 import com.d.localdb.MemoryRecord;
@@ -61,7 +60,6 @@ public class AlarmReceiver extends BroadcastReceiver {
         final LocalDB batteryDB = new LocalDB(context, BatteryRecord.TABLE);
         final LocalDB memoryDB = new LocalDB(context, MemoryRecord.TABLE);
         final LocalDB cpuDB = new LocalDB(context, CPURecord.TABLE);
-        final LocalDB dataDB = new LocalDB(context, DataUsageRecord.TABLE);
         final LocalDB sentDataDB = new LocalDB(context, SentDateRecord.TABLE);
         final List<SentDateRecord> recent = sentDataDB.getAll(null, null, null, true, 1);
         
@@ -100,11 +98,6 @@ public class AlarmReceiver extends BroadcastReceiver {
                 }
                 try {
                     gy.POST(URL + "/cpu").withJson(gson.toJson(new Bulk(deviceId, cpuDB.getAll(null, recentUpload, null, false, null)))).send();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    gy.POST(URL + "/data").withJson(gson.toJson(new Bulk(deviceId, dataDB.getAll(null, recentUpload, null, false, null)))).send();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

@@ -66,8 +66,8 @@ public class WebBatteryActivity extends Activity {
         }
     }
 
-    protected WebView webview;
-    protected LocalDB ldb;
+    WebView webview;
+    LocalDB ldb;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
      
