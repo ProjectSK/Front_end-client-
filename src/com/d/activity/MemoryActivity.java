@@ -31,7 +31,7 @@ public class MemoryActivity extends WebMemoryActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_battery);
+		setContentView(R.layout.activity_vis);
 		ldb = new LocalDB(getBaseContext(), MemoryRecord.TABLE);
 		yaxisName = "Memory (%)";
 		handler = new Handler();

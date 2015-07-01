@@ -30,7 +30,7 @@ public class AppUsageActivity extends WebAppUsageActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_battery);
+		setContentView(R.layout.activity_vis);
 		yaxisName = "AppPackageName";
 		handler = new Handler();
 	//	tv.setMovementMethod(new ScrollingMovementMethod());

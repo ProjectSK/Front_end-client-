@@ -15,7 +15,7 @@
         android:layout_alignLeft="@+id/BatteryController"
         android:layout_alignRight="@+id/BatteryController"
         android:layout_below="@+id/BatteryController"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="12dp"
         android:text="App Usage" />
 
     <Button
@@ -25,7 +25,7 @@
         android:layout_alignLeft="@+id/AppUsageActivity"
         android:layout_alignRight="@+id/AppUsageActivity"
         android:layout_below="@+id/AppUsageActivity"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="12dp"
         android:text="Location" />
 
     <Button
@@ -35,17 +35,17 @@
         android:layout_alignLeft="@+id/LocationLog"
         android:layout_alignRight="@+id/LocationLog"
         android:layout_below="@+id/LocationLog"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="12dp"
         android:text="Memory" />
 
     <Button
         android:id="@+id/deleteTables"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/cpubtn"
-        android:layout_alignRight="@+id/cpubtn"
-        android:layout_below="@+id/cpubtn"
-        android:layout_marginTop="20dp"
+        android:layout_alignLeft="@+id/databtn"
+        android:layout_alignRight="@+id/databtn"
+        android:layout_below="@+id/databtn"
+        android:layout_marginTop="12dp"
         android:text="Stop service" />
 
     <Button
@@ -54,7 +54,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="12dp"
         android:text="Battery Controller" />
     
     <Button
@@ -64,7 +64,17 @@
         android:layout_alignLeft="@+id/membtn"
         android:layout_alignRight="@+id/membtn"
         android:layout_below="@+id/membtn"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="12dp"
         android:text="CPU" />
+    
+    <Button
+        android:id="@+id/databtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/cpubtn"
+        android:layout_alignRight="@+id/cpubtn"
+        android:layout_below="@+id/cpubtn"
+        android:layout_marginTop="12dp"
+        android:text="Data Usage" />
 
 </RelativeLayout>

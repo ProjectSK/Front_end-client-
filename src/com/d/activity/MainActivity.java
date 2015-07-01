@@ -44,7 +44,7 @@ public class MainActivity extends Activity {
 			return rootView;
 		}
 	}
-	Button batteryControllerBotton, appUsageActivityBotton,locbtn, stopbtn,membtn,cpubtn; 
+	Button batteryControllerBotton, appUsageActivityBotton,locbtn, stopbtn,membtn,cpubtn,databtn; 
 	
 	
 	
@@ -60,6 +60,7 @@ public class MainActivity extends Activity {
 		locbtn = (Button)findViewById(R.id.LocationLog);
 		membtn = (Button)findViewById(R.id.membtn);
 		cpubtn = (Button)findViewById(R.id.cpubtn);
+		databtn = (Button)findViewById(R.id.databtn);
 		stopbtn = (Button)findViewById(R.id.deleteTables);
 		
 		
@@ -110,6 +111,14 @@ public class MainActivity extends Activity {
 				startActivity(intent);
 			}
 		});
+		databtn.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(getBaseContext(), DataActivity.class);
+				startActivity(intent);
+			}
+		});
+
 		stopbtn.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {

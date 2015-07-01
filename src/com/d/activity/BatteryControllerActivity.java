@@ -30,7 +30,7 @@ public class BatteryControllerActivity extends WebBatteryActivity  {
 		handler = new Handler();
 		bic = new BatteryInfoCollector(getBaseContext());
 		
-		setContentView(R.layout.activity_battery);
+		setContentView(R.layout.activity_vis);
 		
 		TabHost tabhost = (TabHost) findViewById(android.R.id.tabhost);
 	    tabhost.setup();

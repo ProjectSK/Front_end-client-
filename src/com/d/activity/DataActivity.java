@@ -13,14 +13,15 @@ import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.TabHost.TabSpec;
 
-import com.d.localdb.CPURecord;
+import com.d.activity.WebDataActivity.*;
+import com.d.localdb.DataUsageRecord;
 import com.d.localdb.LocalDB;
-import com.d.utility.CpuUsageCollector;
+import com.d.utility.DataUsageCollector;
 
-public class CPUActivity extends WebCPUActivity {
+public class DataActivity extends WebDataActivity {
 
 
-	CpuUsageCollector cuc;
+	DataUsageCollector muc;
 	private TextView tv;
 	private Handler handler;
 	
@@ -30,21 +31,20 @@ public class CPUActivity extends WebCPUActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_vis);
-		ldb = new LocalDB(getBaseContext(), CPURecord.TABLE);
-		yaxisName = "CPU (%)";
+		ldb = new LocalDB(getBaseContext(), DataUsageRecord.TABLE);
+		yaxisName = "Data";
 		handler = new Handler();
-		
 		
 		TabHost tabhost = (TabHost) findViewById(android.R.id.tabhost);
 	    tabhost.setup();
 	    TabSpec ts = tabhost.newTabSpec("tag1"); 
 	    ts.setContent(R.id.graph);
-	    ts.setIndicator("CPU graph");
+	    ts.setIndicator("Data Usage graph");
 	    tabhost.addTab(ts);
 
 	    ts = tabhost.newTabSpec("tag2"); 
 	    ts.setContent(R.id.present);
-	    ts.setIndicator("CPU Logs");  
+	    ts.setIndicator("Data Usage Logs");  
 	    tabhost.addTab(ts);
 		
 		tv = (TextView) findViewById(R.id.text);
@@ -52,12 +52,12 @@ public class CPUActivity extends WebCPUActivity {
 	
 		/*try {
 			webview.loadDataWithBaseURL("file:///android_asset/",
-					getAssetAsString("html/cpu.html"),
+					getAssetAsString("html/memory.html"),
 					"text/html; charset=utf-8", null, null);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}*/
-		webview.loadUrl("file:///android_asset/html/cpu.html");
+		webview.loadUrl("file:///android_asset/html/data.html");
 		webview.getSettings().setJavaScriptEnabled(true);
 		webview.getSettings().setDomStorageEnabled(true);
 		webview.getSettings().setLoadWithOverviewMode(true);
@@ -68,13 +68,13 @@ public class CPUActivity extends WebCPUActivity {
 
 			@Override
 			public void run() {
-				List<CPURecord> elements = ldb.getAll(null, null, null, true, 100);
+				List<DataUsageRecord> elements = ldb.getAll(null, null, null, true, 100);
 
 				String output = "";
-				for (CPURecord record : elements) {
+				for (DataUsageRecord record : elements) {
 					output += record.toString() + "\n";
 				}
-				//Log.d("CPUActivity", output);
+				//Log.d("memoryActivity", output);
 				tv.setText(output);
 				tv.invalidate();
 
