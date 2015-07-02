@@ -20,18 +20,16 @@ import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 
-import com.d.api.CPUUsage;
-import com.d.localdb.CPURecord;
+import com.d.api.DataUsage;
+import com.d.localdb.DataUsageRecord;
 import com.google.gson.Gson;
 
-public class CPUActivity extends Activity {
+public class DataActivity extends Activity {
 
 	public static class GraphRow {
 		public String date;
-		public long idle;
-		public long other;
-		public long system;
-		public long user;
+		public Long recdata;
+		public Long transdata;
 	}
 	public static class Information {
 		ArrayList<GraphRow> data = new ArrayList<GraphRow>();
@@ -57,16 +55,16 @@ public class CPUActivity extends Activity {
 
 	public static String yaxisName;
 
-	CPUUsage cu;
-
 	protected SimpleDateFormat dateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 
-	private Handler handler;
+	private DataUsage du;
 
+	private Handler handler;
+	
 	private TextView tv;
 
-	WebView webview;
+	protected WebView webview;
 	public String getAssetAsString(String path) throws IOException {
 		StringBuilder buf = new StringBuilder();
 		InputStream json;
@@ -89,15 +87,13 @@ public class CPUActivity extends Activity {
 		Information info = new Information();
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.DAY_OF_MONTH, -1);
-		List<CPURecord> records = cu.getRecords(20000);
+		List<DataUsageRecord> records = du.getRecords(20000);
 		ArrayList<GraphRow> data = new ArrayList<GraphRow>(records.size());
-		for (CPURecord record : records) {
+		for (DataUsageRecord record : records) {
 			GraphRow row = new GraphRow();
 			row.date = dateFormat.format(record.time);
-			row.user = record.user;
-			row.system = record.system;
-			row.idle = record.idle;
-			row.other = record.other;
+			row.transdata = record.trans_data;
+			row.recdata = record.rec_data;
 			data.add(row);
 		}
 		info.data = data;
@@ -109,27 +105,31 @@ public class CPUActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_vis);
-		yaxisName = "CPU (%)";
+		du = new DataUsage(getBaseContext());
+		yaxisName = "Data";
 		handler = new Handler();
-		cu = new CPUUsage(getBaseContext());
 
 		TabHost tabhost = (TabHost) findViewById(android.R.id.tabhost);
 		tabhost.setup();
 		TabSpec ts = tabhost.newTabSpec("tag1");
 		ts.setContent(R.id.graph);
-		ts.setIndicator("CPU graph");
+		ts.setIndicator("Data Usage graph");
 		tabhost.addTab(ts);
 
 		ts = tabhost.newTabSpec("tag2");
 		ts.setContent(R.id.present);
-		ts.setIndicator("CPU Logs");
+		ts.setIndicator("Data Usage Logs");
 		tabhost.addTab(ts);
 
 		tv = (TextView) findViewById(R.id.text);
 		webview = (WebView) findViewById(R.id.webview_graph);
 
-		
-		webview.loadUrl("file:///android_asset/html/cpu.html");
+		/*
+		 * try { webview.loadDataWithBaseURL("file:///android_asset/",
+		 * getAssetAsString("html/memory.html"), "text/html; charset=utf-8",
+		 * null, null); } catch (IOException e) { e.printStackTrace(); }
+		 */
+		webview.loadUrl("file:///android_asset/html/data.html");
 		webview.getSettings().setJavaScriptEnabled(true);
 		webview.getSettings().setDomStorageEnabled(true);
 		webview.getSettings().setLoadWithOverviewMode(true);
@@ -139,17 +139,16 @@ public class CPUActivity extends Activity {
 
 			@Override
 			public void run() {
-				List<CPURecord> elements = cu.getRecords(100);
+				List<DataUsageRecord> elements = du.getRecords(100);
 
 				String output = "";
-				for (CPURecord record : elements) {
+				for (DataUsageRecord record : elements) {
 					output += record.toString() + "\n";
 				}
-				
 				tv.setText(output);
 				tv.invalidate();
 
-				handler.postDelayed(this, 2000); // set time here to refresh
+				handler.postDelayed(this, 2000); 
 			}
 		});
 

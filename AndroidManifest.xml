@@ -1,34 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.d.activity"
     android:versionCode="1"
     android:versionName="1.0" >
-
 
     <uses-sdk
         android:minSdkVersion="21"
         android:targetSdkVersion="21" />
 
-    <!--   <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS"/> -->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS"/>
+ 
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions"/>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="com.android.alarm.permission.SET_ALARM"/> 
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" android:largeHeap="true" android:requiredForAllUsers="true">
-        <meta-data android:name="com.google.android.gms.version"
-                   android:value="@integer/google_play_services_version" />
+        android:largeHeap="true"
+        android:requiredForAllUsers="true"
+        android:theme="@style/AppTheme" >
         <meta-data
-           android:name="com.google.android.maps.v2.API_KEY"
-           android:value="AIzaSyATah9RPD7rxeRpIiIMhzRTIrqw1v9UxqI" />
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyATah9RPD7rxeRpIiIMhzRTIrqw1v9UxqI" />
+
         <activity
             android:name="MainActivity"
             android:label="@string/app_name" >
@@ -38,20 +43,37 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="BatteryControllerActivity"></activity>
-        <activity android:name="AppUsageActivity"></activity>
-        <activity android:name="LocationActivity"></activity>
-        <activity android:name="MemoryActivity"></activity>
-        <activity android:name="googleMapActivity"></activity>
-        <activity android:name="CPUActivity"></activity>
-        
-        <activity android:name="WebAppUsageActivity"></activity>
-        <activity android:name="WebBatteryActivity"></activity>
-        <activity android:name="WebCPUActivity"></activity>
-        <activity android:name="WebMemoryActivity"></activity>
-        <service android:name="com.d.utility.ServiceClass"></service>
-        <service android:name="com.d.utility.SenderService"></service>
-        <receiver android:name="com.d.utility.AlarmReceiver"/> 
+        <activity android:name="BatteryControllerActivity" >
+        </activity>
+        <activity android:name="AppUsageActivity" >
+        </activity>
+        <activity android:name="LocationActivity" >
+        </activity>
+        <activity android:name="MemoryActivity" >
+        </activity>
+        <activity android:name="googleMapActivity" >
+        </activity>
+        <activity android:name="CPUActivity" >
+        </activity>
+        <activity android:name="DataActivity" >
+        </activity>
+        <activity android:name="WebAppUsageActivity" >
+        </activity>
+        <activity android:name="WebDataActivity" >
+        </activity>
+        <activity android:name="WebBatteryActivity" >
+        </activity>
+        <activity android:name="WebCPUActivity" >
+        </activity>
+        <activity android:name="WebMemoryActivity" >
+        </activity>
+
+        <service android:name="com.d.utility.ServiceClass" >
+        </service>
+        <service android:name="com.d.utility.SenderService" >
+        </service>
+
+        <receiver android:name="com.d.utility.AlarmReceiver" />
     </application>
-    
+
 </manifest>

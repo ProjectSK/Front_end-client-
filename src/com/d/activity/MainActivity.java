@@ -7,6 +7,7 @@ import android.app.AppOpsManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,11 +19,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.d.httpmodule.HttpConnect;
-import com.d.localdb.AppUsageRecord;
-import com.d.localdb.LocalDB;
-import com.d.localdb.LocationLogRecord;
-import com.d.utility.AlarmReceiver;
-import com.d.utility.CpuUsageCollector;
 import com.d.utility.SenderService;
 import com.d.utility.ServiceClass;
 
@@ -44,82 +40,91 @@ public class MainActivity extends Activity {
 			return rootView;
 		}
 	}
-	Button batteryControllerBotton, appUsageActivityBotton,locbtn, stopbtn,membtn,cpubtn; 
-	
-	
-	
+
+	Button batteryControllerBotton, appUsageActivityBotton, locbtn, stopbtn,
+			membtn, cpubtn, databtn;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
 
-		
-		batteryControllerBotton = (Button)findViewById(R.id.BatteryController);
-		appUsageActivityBotton = (Button)findViewById(R.id.AppUsageActivity);
-		locbtn = (Button)findViewById(R.id.LocationLog);
-		membtn = (Button)findViewById(R.id.membtn);
-		cpubtn = (Button)findViewById(R.id.cpubtn);
-		stopbtn = (Button)findViewById(R.id.deleteTables);
-		
-		
-		
+		batteryControllerBotton = (Button) findViewById(R.id.BatteryController);
+		appUsageActivityBotton = (Button) findViewById(R.id.AppUsageActivity);
+		locbtn = (Button) findViewById(R.id.LocationLog);
+		membtn = (Button) findViewById(R.id.membtn);
+		cpubtn = (Button) findViewById(R.id.cpubtn);
+		databtn = (Button) findViewById(R.id.databtn);
+		stopbtn = (Button) findViewById(R.id.deleteTables);
+
 		permission_check();
-		
+
 		Intent serviceIntent = new Intent(MainActivity.this, ServiceClass.class);
-        startService(serviceIntent);
+		startService(serviceIntent);
 
-        serviceIntent = new Intent(MainActivity.this, SenderService.class);
-        startService(serviceIntent);
+		serviceIntent = new Intent(MainActivity.this, SenderService.class);
+		startService(serviceIntent);
 
-        //Log.d("main", "onStart()");
-		
-		
-		batteryControllerBotton.setOnClickListener(new OnClickListener(){
+		// Log.d("main", "onStart()");
+
+		batteryControllerBotton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(getBaseContext(), BatteryControllerActivity.class);
+				Intent intent = new Intent(getBaseContext(),
+						BatteryControllerActivity.class);
 				startActivity(intent);
 			}
 		});
-		appUsageActivityBotton.setOnClickListener(new OnClickListener(){
+		appUsageActivityBotton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(getBaseContext(), AppUsageActivity.class);
+				Intent intent = new Intent(getBaseContext(),
+						AppUsageActivity.class);
 				startActivity(intent);
 			}
 		});
-		locbtn.setOnClickListener(new OnClickListener(){
+		locbtn.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(getBaseContext(), LocationActivity.class);
+				Intent intent = new Intent(getBaseContext(),
+						LocationActivity.class);
 				startActivity(intent);
 			}
 		});
-		membtn.setOnClickListener(new OnClickListener(){
+		membtn.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(getBaseContext(), MemoryActivity.class);
+				Intent intent = new Intent(getBaseContext(),
+						MemoryActivity.class);
 				startActivity(intent);
 			}
 		});
-		cpubtn.setOnClickListener(new OnClickListener(){
+		cpubtn.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent(getBaseContext(), CPUActivity.class);
 				startActivity(intent);
 			}
 		});
-		stopbtn.setOnClickListener(new OnClickListener(){
+		databtn.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				 Intent serviceIntent = new Intent(MainActivity.this, ServiceClass.class);
-			     stopService(serviceIntent);
-			     onDestroy();
-			     System.exit(0);
+				Intent intent = new Intent(getBaseContext(), DataActivity.class);
+				startActivity(intent);
 			}
 		});
-		
+
+		stopbtn.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent serviceIntent = new Intent(MainActivity.this,
+						ServiceClass.class);
+				stopService(serviceIntent);
+				onDestroy();
+				System.exit(0);
+			}
+		});
+
 	}
 
 	@Override
@@ -130,10 +135,9 @@ public class MainActivity extends Activity {
 		return true;
 	}
 
-	public void onDestroy() {   
-	    super.onDestroy();
-	   
-	    
+	public void onDestroy() {
+		super.onDestroy();
+
 	}
 
 	@Override
@@ -147,18 +151,23 @@ public class MainActivity extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	void permission_check(){
+
+	void permission_check() {
 		Context context = getBaseContext();
 		AppOpsManager appOps = (AppOpsManager) context
-		        .getSystemService(Context.APP_OPS_SERVICE);
-		boolean granted = appOps.checkOpNoThrow("android:get_usage_stats", 
-		        android.os.Process.myUid(), context.getPackageName()) == AppOpsManager.MODE_ALLOWED;
-		 Log.d("permission_check", "android:get_usage_stats() : " + granted);
+				.getSystemService(Context.APP_OPS_SERVICE);
+		boolean granted = appOps.checkOpNoThrow("android:get_usage_stats",
+				android.os.Process.myUid(), context.getPackageName()) == AppOpsManager.MODE_ALLOWED;
+		Log.d("permission_check", "android:get_usage_stats() : " + granted);
+		if(!granted){
+			Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+			startActivity(intent);
+		}
 	}
-	private String sendData(JSONArray data){
-		HttpConnect connect = new HttpConnect("52.11.1.59:3180/send",data);
+
+	private String sendData(JSONArray data) {
+		HttpConnect connect = new HttpConnect("52.11.1.59:3180/send", data);
 		return connect.connect();
 	}
 
 }
-

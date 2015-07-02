@@ -4,14 +4,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="com.example.d.MainActivity" >
-
-    <SeekBar
-        android:id="@+id/seekBar_resolution"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:progress="2"
-        android:max="2"
-         />
     <fragment
        android:id="@+id/location_map"
        android:name="com.google.android.gms.maps.MapFragment"

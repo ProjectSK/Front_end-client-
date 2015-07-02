@@ -17,6 +17,7 @@ import android.util.Log;
 
 import com.d.localdb.LocalDB;
 import com.d.localdb.LocationLogRecord;
+import com.google.android.gms.maps.GoogleMap;
 
 public class LocationCollector implements LocationListener {
 	private static final SimpleDateFormat dateFormat = new SimpleDateFormat(
@@ -36,6 +37,8 @@ public class LocationCollector implements LocationListener {
 	boolean isNetworkEnabled = false;
 	double latitude; // latitude
 	Location location; // location
+	GoogleMap googleMap;
+	
 
 	// Declaring a Location Manager
 	protected LocationManager locationManager;
@@ -82,6 +85,7 @@ public class LocationCollector implements LocationListener {
 			// getting network status
 			isNetworkEnabled = locationManager
 					.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+			
 
 			if (!isGPSEnabled && !isNetworkEnabled) {
 				// no network provider is enabled

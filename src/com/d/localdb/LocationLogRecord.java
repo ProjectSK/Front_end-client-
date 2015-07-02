@@ -10,20 +10,19 @@ public class LocationLogRecord implements Record {
                 new SQLVColumn [] {
                     new ReflVColumn(LocationLogRecord.class, "time", ColumnType.Datetime, true),
                     new ReflVColumn(LocationLogRecord.class, "latitude", ColumnType.Double, false),
-                    new ReflVColumn(LocationLogRecord.class, "longtitude", ColumnType.Double, false)
+                    new ReflVColumn(LocationLogRecord.class, "longitude", ColumnType.Double, false)
         });
 
     public Double latitude;
-
-    public Double longtitude;
+    public Double longitude;
 
     public Date time;
     public LocationLogRecord() {
     }
-    public LocationLogRecord(Date time, Double latitude, Double longtitude) {
+    public LocationLogRecord(Date time, Double latitude, Double longitude) {
         this.time = time;
         this.latitude = latitude;
-        this.longtitude = longtitude;
+        this.longitude = longitude;
     }
 
     @Override
@@ -33,6 +32,6 @@ public class LocationLogRecord implements Record {
     
     @Override
     public String toString() {
-        return String.format(Locale.getDefault(), "[time=%s, latitude=%.2f, longitude=%.2f]", time.toString(), latitude, longtitude);
+        return String.format(Locale.getDefault(), "[time=%s, latitude=%.2f, longitude=%.2f]", time.toString(), latitude, longitude);
     }
 }

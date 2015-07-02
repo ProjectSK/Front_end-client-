@@ -31,7 +31,7 @@ body {
 <div id="viz"></div>
 <div id = "test"></div>
 <script type="text/javascript">
-    var margin = {top: 20, right: 80, bottom: 30, left: 50},
+    var margin = {top: 20, right: 80, bottom: 30, left: 120},
         width = 960 - margin.left - margin.right,
         height = 500 - margin.top - margin.bottom;
 
@@ -65,17 +65,28 @@ body {
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     var test = document.getElementById('test');
-   
+    
 
     var info = JSON.parse(Android.info())
     var yaxisDesc = info.yaxisDesc;
     var data = info.data;
+    var len = data.length;
 
-    color.domain(d3.keys(data[0]).filter(function(key) { return key !== "date"; }));
 
-    data.forEach(function(d) {
-            d.date = parseDate(d.date);
+    color.domain(d3.keys(data[0]).filter(function(key) { return key !== "date"||"elapsedTime"; }));
+
+    data.forEach(function(d){
+            d.date=parseDate(d.date);
             });
+
+    for(var i=len-2;i>=0;i--){
+        var t = Number(data[i].transdata)+Number(data[i+1].transdata);
+        var r = Number(data[i].recdata)+Number(data[i+1].recdata);
+        data[i].transdata = t;
+        data[i].recdata = r;
+    }
+
+
 
     var pers = color.domain().map(function(name){
             return{
@@ -86,9 +97,22 @@ body {
                 };
                 });
 
+
+
+
     x.domain(d3.extent(data, function(d) { return d.date; }));
-    y.domain([0,100]);
-//    y.domain([d3.min(data, function(d) { return d.capacity; }),d3.max(data, function(d) { return d.capacity; })]);
+    y.domain([d3.min(data, function(d) { if(Number(d.transdata)>Number(d.recdata)){
+                return d.transdata;
+                }else{
+                return d.recdata;
+                }
+                }),d3.max(data, function(d) { if(Number(d.transdata)>Number(d.recdata)){
+                    return d.transdata;
+                    }else{
+                    return d.recdata;
+                    }
+                    })]);
+
     svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
@@ -105,21 +129,20 @@ body {
         .text(yaxisDesc);
 
 
-
-    var graphline = svg.selectAll(".graphline")
+    var dataUsage = svg.selectAll(".data")
         .data(pers)
         .enter().append("g")
         .attr("class", function(d){return d.name;});
 
 
-    graphline.append("path")
+    dataUsage.append("path")
         .attr("class", "line")
         .attr("d", function(d) { return line(d.values); })
         .style("stroke", function(d) { return color(d.name); });
 
 
 
-    graphline.append("text")
+    dataUsage.append("text")
         .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
         .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.graphval) + ")"; })
         .attr("x",width-margin.right)

@@ -1,89 +1,169 @@
 package com.d.activity;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 
+import com.d.api.BatteryUsage;
 import com.d.localdb.BatteryRecord;
-import com.d.localdb.LocalDB;
-import com.d.utility.BatteryInfoCollector;
+import com.google.gson.Gson;
 
-public class BatteryControllerActivity extends WebBatteryActivity  {
+public class BatteryControllerActivity extends Activity {
 
-	BatteryInfoCollector bic;
-	private TextView tv;
+	public static class GraphRow {
+		public String date;
+		public float percentage;
+		public float temperature;
+	}
+
+	public static class Information {
+		ArrayList<GraphRow> data = new ArrayList<GraphRow>();
+
+		public String yaxisDesc;
+
+		Information() {
+			yaxisDesc = yaxisName;
+		}
+	}
+
+	public class JSInterface {
+		Information info;
+
+		public JSInterface() {
+			info = getInformation();
+		}
+
+		@JavascriptInterface
+		public String info() {
+			return new Gson().toJson(info);
+		}
+	}
+
+	public static String yaxisName;
+
+	BatteryUsage bu;
+
+	protected SimpleDateFormat dateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+
 	private Handler handler;
-	
+
+
+	private TextView tv;
+
+	WebView webview;
+
+	public String getAssetAsString(String path) throws IOException {
+		StringBuilder buf = new StringBuilder();
+		InputStream json;
+		json = getAssets().open(path);
+		BufferedReader in = null;
+		try {
+			in = new BufferedReader(new InputStreamReader(json, "UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		String str;
+		while ((str = in.readLine()) != null) {
+			buf.append(str);
+		}
+		in.close();
+		return buf.toString();
+	}
+
+	protected Information getInformation() {
+		Information info = new Information();
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.DAY_OF_MONTH, -1);
+		List<BatteryRecord> records = bu.getRecords(20000);
+		ArrayList<GraphRow> data = new ArrayList<GraphRow>(records.size());
+		for (BatteryRecord record : records) {
+			GraphRow row = new GraphRow();
+			row.date = dateFormat.format(record.time);
+			row.percentage = (float) record.capacity;
+			row.temperature = (float) record.temperature;
+			data.add(row);
+		}
+		info.data = data;
+		return info;
+	}
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		yaxisName = "Battery (%)";
-		ldb = new LocalDB(getBaseContext(), BatteryRecord.TABLE);
 		handler = new Handler();
-		bic = new BatteryInfoCollector(getBaseContext());
-		
-		setContentView(R.layout.activity_battery);
-		
-		TabHost tabhost = (TabHost) findViewById(android.R.id.tabhost);
-	    tabhost.setup();
-	    TabSpec ts = tabhost.newTabSpec("tag1"); 
-	    ts.setContent(R.id.graph);
-	    ts.setIndicator("Capacity graph");
-	    tabhost.addTab(ts);
+		bu = new BatteryUsage(getBaseContext());
 
-	    ts = tabhost.newTabSpec("tag2"); 
-	    ts.setContent(R.id.present);
-	    ts.setIndicator("Present state");  
-	    tabhost.addTab(ts);
-		
+		setContentView(R.layout.activity_vis);
+
+		TabHost tabhost = (TabHost) findViewById(android.R.id.tabhost);
+		tabhost.setup();
+		TabSpec ts = tabhost.newTabSpec("tag1");
+		ts.setContent(R.id.graph);
+		ts.setIndicator("Capacity graph");
+		tabhost.addTab(ts);
+
+		ts = tabhost.newTabSpec("tag2");
+		ts.setContent(R.id.present);
+		ts.setIndicator("Present state");
+		tabhost.addTab(ts);
+
 		tv = (TextView) findViewById(R.id.text);
-		webview =  (WebView) findViewById(R.id.webview_battery);
-	
-		/*try {
-			webview.loadDataWithBaseURL("file:///android_asset/",
-					getAssetAsString("html/battery.html"),
-					"text/html; charset=utf-8", null, null);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}*/
+		webview = (WebView) findViewById(R.id.webview_graph);
+
 		webview.loadUrl("file:///android_asset/html/battery.html");
 		webview.getSettings().setJavaScriptEnabled(true);
 		webview.getSettings().setDomStorageEnabled(true);
 		webview.getSettings().setLoadWithOverviewMode(true);
 		webview.addJavascriptInterface(new JSInterface(), "Android");
-		
 
 		handler.post(new Runnable() {
 
 			@Override
 			public void run() {
 
-				registerReceiver(bic.bcr, bic.filter);
-				List<BatteryRecord> elements = ldb.getAll(null, null, null, true, 1);
 				
+				BatteryRecord record = bu.getSingleRecord();
 				String batteryInfoMessage = "";
-				for (BatteryRecord record : elements) {								
-					batteryInfoMessage += "Battery Voltage : " + record.voltage + "mV\n";
-					batteryInfoMessage += "Battery Level : " + record.level + "\n";
-					batteryInfoMessage += "Battery Scale : " + record.scale + "\n";
-					batteryInfoMessage += "Battery Temperature : " + record.temperature + "ï¿½ï¿½C\n";
-					batteryInfoMessage += "Battery Plug Type : " + record.plugType + "\n";
-					batteryInfoMessage += "Battery Health Type : " + record.healthType + "\n";
-					batteryInfoMessage += "Battery Capacity : " + record.capacity + "%\n";
-					
+				if(record!= null){
+					batteryInfoMessage += "Battery Voltage : " + record.voltage
+							+ "mV\n";
+					batteryInfoMessage += "Battery Level : " + record.level
+							+ "\n";
+					batteryInfoMessage += "Battery Scale : " + record.scale
+							+ "\n";
+					batteryInfoMessage += "Battery Temperature : "
+							+ record.temperature + "¡ÆC\n";
+					batteryInfoMessage += "Battery Plug Type : "
+							+ record.plugType + "\n";
+					batteryInfoMessage += "Battery Health Type : "
+							+ record.healthType + "\n";
+					batteryInfoMessage += "Battery Capacity : "
+							+ record.capacity + "%\n";
+
 				}
-				
+
 				tv.setText(batteryInfoMessage);
 				tv.invalidate();
-				handler.postDelayed(this, bic.batteryCalculator()); // set time here to refresh
+				handler.postDelayed(this, 3 * 1000); 
 			}
 		});
 
@@ -95,7 +175,6 @@ public class BatteryControllerActivity extends WebBatteryActivity  {
 	public void onDestroy() {
 		super.onDestroy();
 		handler.removeMessages(0);
-		ldb.close();
 	}
 
 }
