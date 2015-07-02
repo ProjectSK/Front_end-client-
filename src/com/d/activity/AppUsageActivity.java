@@ -28,11 +28,12 @@ import com.google.gson.Gson;
 
 public class AppUsageActivity extends Activity {
 
-	public static class GraphRow {
+	private static class GraphRow {
 		public Long elapsedTime;
 		public String name;
 		public String startTime;
 	}
+	
 
 	public static class Information {
 		ArrayList<GraphRow> data = new ArrayList<GraphRow>();
@@ -64,23 +65,6 @@ public class AppUsageActivity extends Activity {
 	private TextView tv;
 	protected WebView webview;
 
-	public String getAssetAsString(String path) throws IOException {
-		StringBuilder buf = new StringBuilder();
-		InputStream json;
-		json = getAssets().open(path);
-		BufferedReader in = null;
-		try {
-			in = new BufferedReader(new InputStreamReader(json, "UTF-8"));
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		String str;
-		while ((str = in.readLine()) != null) {
-			buf.append(str);
-		}
-		in.close();
-		return buf.toString();
-	}
 
 	protected Information getInformation() {
 		Information info = new Information();
@@ -135,13 +119,13 @@ public class AppUsageActivity extends Activity {
 
 			@Override
 			public void run() {
-				List<AppUsage.Resource> stats = au.getStaticInfos();
+				List<AppUsage.StatisticalInfo> stats = au.getStatisticalInfos();
 				List<AppUsageRecord> records = au.getRecords(100);
 
 				String output = "";
 
 				output += "Package Name, Overall Time(s), Number of Execution\n";
-				for (AppUsage.Resource res : stats) {
+				for (AppUsage.StatisticalInfo res : stats) {
 					output += res.PackageName + ", " + res.overallTime + ", "
 							+ res.numberOfExecution + "\n";
 				}
