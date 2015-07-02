@@ -26,12 +26,15 @@ import com.google.gson.Gson;
 
 public class BatteryControllerActivity extends Activity {
 
-	public static class GraphRow {
+	private static class GraphRow {
 		public String date;
 		public float percentage;
 		public float temperature;
 	}
-
+	/**
+	 * 자바스크립트에서 그래프를 그릴 때 참조할 Record들과 y축의 이름을 전달하는 Container 
+	 * @author Jun
+	 */
 	public static class Information {
 		ArrayList<GraphRow> data = new ArrayList<GraphRow>();
 
@@ -42,7 +45,7 @@ public class BatteryControllerActivity extends Activity {
 		}
 	}
 
-	public class JSInterface {
+	private class JSInterface {
 		Information info;
 
 		public JSInterface() {
@@ -55,9 +58,9 @@ public class BatteryControllerActivity extends Activity {
 		}
 	}
 
-	public static String yaxisName;
+	private static String yaxisName;
 
-	BatteryUsage bu;
+	private BatteryUsage bu;
 
 	protected SimpleDateFormat dateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd HH:mm:ss", Locale.getDefault());
@@ -67,25 +70,7 @@ public class BatteryControllerActivity extends Activity {
 
 	private TextView tv;
 
-	WebView webview;
-
-	public String getAssetAsString(String path) throws IOException {
-		StringBuilder buf = new StringBuilder();
-		InputStream json;
-		json = getAssets().open(path);
-		BufferedReader in = null;
-		try {
-			in = new BufferedReader(new InputStreamReader(json, "UTF-8"));
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		String str;
-		while ((str = in.readLine()) != null) {
-			buf.append(str);
-		}
-		in.close();
-		return buf.toString();
-	}
+	private WebView webview;
 
 	protected Information getInformation() {
 		Information info = new Information();

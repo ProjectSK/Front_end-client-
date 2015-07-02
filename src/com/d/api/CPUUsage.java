@@ -10,10 +10,17 @@ import com.d.localdb.LocalDB;
 
 public class CPUUsage {
 	private Context context;
-	LocalDB ldb;
+
+	private LocalDB ldb;
 	public CPUUsage(Context context){
 		this.context = context;
 	}
+	/**
+	 * 하룻동안 수집된 기록을 상한 만큼 불러오는 method.
+	 * 저장된 것의 최신순으로 불려온다.
+	 * @param limit DB에서 불러올 Record의 상한
+	 * @return DB에서 불러온 a list of  Records.
+	 */
 	public List<CPURecord> getRecords(int limit){
 		List<CPURecord> records;
 		ldb = new LocalDB(context, CPURecord.TABLE);

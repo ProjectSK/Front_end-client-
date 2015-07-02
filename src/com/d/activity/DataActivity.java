@@ -14,6 +14,7 @@ import java.util.Locale;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.method.ScrollingMovementMethod;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.widget.TabHost;
@@ -26,12 +27,12 @@ import com.google.gson.Gson;
 
 public class DataActivity extends Activity {
 
-	public static class GraphRow {
+	private static class GraphRow {
 		public String date;
 		public Long recdata;
 		public Long transdata;
 	}
-	public static class Information {
+	private static class Information {
 		ArrayList<GraphRow> data = new ArrayList<GraphRow>();
 
 		public String yaxisDesc;
@@ -40,7 +41,7 @@ public class DataActivity extends Activity {
 			yaxisDesc = yaxisName;
 		}
 	}
-	public class JSInterface {
+	private class JSInterface {
 		Information info;
 
 		public JSInterface() {
@@ -53,9 +54,9 @@ public class DataActivity extends Activity {
 		}
 	}
 
-	public static String yaxisName;
+	private static String yaxisName;
 
-	protected SimpleDateFormat dateFormat = new SimpleDateFormat(
+	private SimpleDateFormat dateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 
 	private DataUsage du;
@@ -64,26 +65,10 @@ public class DataActivity extends Activity {
 	
 	private TextView tv;
 
-	protected WebView webview;
-	public String getAssetAsString(String path) throws IOException {
-		StringBuilder buf = new StringBuilder();
-		InputStream json;
-		json = getAssets().open(path);
-		BufferedReader in = null;
-		try {
-			in = new BufferedReader(new InputStreamReader(json, "UTF-8"));
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		String str;
-		while ((str = in.readLine()) != null) {
-			buf.append(str);
-		}
-		in.close();
-		return buf.toString();
-	}
+	private WebView webview;
+	
 
-	protected Information getInformation() {
+	private Information getInformation() {
 		Information info = new Information();
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.DAY_OF_MONTH, -1);
@@ -122,6 +107,7 @@ public class DataActivity extends Activity {
 		tabhost.addTab(ts);
 
 		tv = (TextView) findViewById(R.id.text);
+		tv.setMovementMethod(ScrollingMovementMethod.getInstance());
 		webview = (WebView) findViewById(R.id.webview_graph);
 
 		/*

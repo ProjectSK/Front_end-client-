@@ -14,6 +14,7 @@ import java.util.Locale;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.method.ScrollingMovementMethod;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.widget.TabHost;
@@ -26,13 +27,17 @@ import com.google.gson.Gson;
 
 public class CPUActivity extends Activity {
 
-	public static class GraphRow {
+	private static class GraphRow {
 		public String date;
 		public long idle;
 		public long other;
 		public long system;
 		public long user;
 	}
+	/**
+	 * 자바스크립트에서 그래프를 그릴 때 참조할 Record들과 y축의 이름을 전달하는 Container 
+	 * @author Jun
+	 */
 	public static class Information {
 		ArrayList<GraphRow> data = new ArrayList<GraphRow>();
 
@@ -42,7 +47,7 @@ public class CPUActivity extends Activity {
 			yaxisDesc = yaxisName;
 		}
 	}
-	public class JSInterface {
+	private class JSInterface {
 		Information info;
 
 		public JSInterface() {
@@ -55,37 +60,20 @@ public class CPUActivity extends Activity {
 		}
 	}
 
-	public static String yaxisName;
+	private static String yaxisName;
 
-	CPUUsage cu;
+	private CPUUsage cu;
 
-	protected SimpleDateFormat dateFormat = new SimpleDateFormat(
+	private SimpleDateFormat dateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 
 	private Handler handler;
 
 	private TextView tv;
 
-	WebView webview;
-	public String getAssetAsString(String path) throws IOException {
-		StringBuilder buf = new StringBuilder();
-		InputStream json;
-		json = getAssets().open(path);
-		BufferedReader in = null;
-		try {
-			in = new BufferedReader(new InputStreamReader(json, "UTF-8"));
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		String str;
-		while ((str = in.readLine()) != null) {
-			buf.append(str);
-		}
-		in.close();
-		return buf.toString();
-	}
-
-	protected Information getInformation() {
+	private WebView webview;
+	
+	private Information getInformation() {
 		Information info = new Information();
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.DAY_OF_MONTH, -1);
@@ -134,6 +122,7 @@ public class CPUActivity extends Activity {
 		webview.getSettings().setDomStorageEnabled(true);
 		webview.getSettings().setLoadWithOverviewMode(true);
 		webview.addJavascriptInterface(new JSInterface(), "Android");
+		tv.setMovementMethod(ScrollingMovementMethod.getInstance());
 
 		handler.post(new Runnable() {
 

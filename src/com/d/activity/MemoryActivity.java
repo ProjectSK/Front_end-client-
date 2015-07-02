@@ -26,12 +26,12 @@ import com.google.gson.Gson;
 
 public class MemoryActivity extends Activity {
 
-	public static class GraphRow {
+	private static class GraphRow {
 		public String date;
 		public float percentageUsage;
 	}
 
-	public static class Information {
+	private static class Information {
 		ArrayList<GraphRow> data = new ArrayList<GraphRow>();
 
 		public String yaxisDesc;
@@ -41,7 +41,7 @@ public class MemoryActivity extends Activity {
 		}
 	}
 
-	public class JSInterface {
+	private class JSInterface {
 		Information info;
 
 		public JSInterface() {
@@ -54,36 +54,20 @@ public class MemoryActivity extends Activity {
 		}
 	}
 
-	public static String yaxisName;
+	private static String yaxisName;
 
 	protected SimpleDateFormat dateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 
 	private Handler handler;
 
-	MemoryUsage mu;
+	private MemoryUsage mu;
 
 	private TextView tv;
 
-	WebView webview;
-	public String getAssetAsString(String path) throws IOException {
-		StringBuilder buf = new StringBuilder();
-		InputStream json;
-		json = getAssets().open(path);
-		BufferedReader in = null;
-		try {
-			in = new BufferedReader(new InputStreamReader(json, "UTF-8"));
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		String str;
-		while ((str = in.readLine()) != null) {
-			buf.append(str);
-		}
-		in.close();
-		return buf.toString();
-	}
-	protected Information getInformation() {
+	private WebView webview;
+	
+	private Information getInformation() {
 		Information info = new Information();
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.DAY_OF_MONTH, -1);

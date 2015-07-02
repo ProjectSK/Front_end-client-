@@ -11,13 +11,13 @@ import com.d.localdb.LocalDB;
 
 public class AppUsage {
 	/**
-	 *  가공된 정보를 건네주기 위한 structure
+	 *  App Usage 기록의 Statistical information을 전달하는 container
 	 */	
-	public class Resource{
+	public class StatisticalInfo{
 		public int numberOfExecution;
 		public int overallTime;
 		public String PackageName;
-		public Resource(String packgeName, int overallTime,
+		public StatisticalInfo(String packgeName, int overallTime,
 				int numberOfExecution) {
 			PackageName = packgeName;
 			this.overallTime = overallTime;
@@ -41,6 +41,12 @@ public class AppUsage {
 		this.context = context;
 	}
 	
+	/**
+	 * 하룻동안 수집된 기록을 상한 만큼 불러오는 method.
+	 * 저장된 것의 최신순으로 불려온다.
+	 * @param limit DB에서 불러올 Record의 상한
+	 * @return DB에서 불러온 a list of  Records.
+	 */
 	public List<AppUsageRecord> getRecords(int limit){
 		List<AppUsageRecord> retValues;
 		locdb = new LocalDB(context, AppUsageRecord.TABLE);
@@ -56,8 +62,13 @@ public class AppUsage {
 		}
 		return retValues;
 	}
-	public List<Resource> getStaticInfos(){
-		List<Resource> resources = new ArrayList<Resource>();
+	/**
+	 * 하룻동안 App Usage 기록의 Statistical information을 획득하는 Method.
+	 * 각 package의 이름, 하룻동안 실행된 시간, 하룻동안 실행된 횟수를 StatisticalInfo class에 저장하여 전달한다. 
+	 * @return the list of statistical informations On App Usage.
+	 */
+	public List<StatisticalInfo> getStatisticalInfos(){
+		List<StatisticalInfo> resources = new ArrayList<StatisticalInfo>();
 		ArrayList<String> packageNames = new ArrayList<String>();
 		locdb = new LocalDB(context, AppUsageRecord.TABLE);
 		try{
@@ -65,7 +76,7 @@ public class AppUsage {
 			List<AppUsageRecord> records  =locdb.getAll(new AppUsageRecord(),new Date(yesterday), null, true, 50000);
 			for (AppUsageRecord record : records) {
 				if(!packageNames.contains(record.packageName)){
-					resources.add(new Resource(record.packageName, 0, 0));
+					resources.add(new StatisticalInfo(record.packageName, 0, 0));
 					packageNames.add(record.packageName);
 				}
 				int idx = packageNames.indexOf(record.packageName);

@@ -34,125 +34,21 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 public class LocationActivity extends Activity {
-	public static enum Interval {
-		OneDay, ThirtyMin, ThreeHour
-	}
+	
 
-	public class MapCtrl {
-		boolean isFirst = true;
-
-		public void draw(boolean move) {
-			Calendar curCalender = Calendar.getInstance();
-			Calendar prevCalendar = delCalender(Calendar.getInstance(),
-					curInterval);
-
-			ArrayList<LocationLogRecord> points = new ArrayList<LocationLogRecord>();
-			for (int idx = 0; idx < N_INTERVALS; idx++) {
-				LocationLogRecord record = lt.getSingleRecord(prevCalendar.getTime(), curCalender.getTime());
-				if (record!=null) {
-					points.add(record);
-				}
-				curCalender = prevCalendar;
-				prevCalendar = delCalender(prevCalendar, curInterval);
-
-			}
-
-			for (int idx = 0; idx < points.size(); idx++) {
-				float oldRatio = (float) idx / points.size();
-				LocationLogRecord record = points.get(idx);
-				googleMap.addMarker(new MarkerOptions().position(
-						new LatLng(record.latitude, record.longitude)).alpha(
-						1 - oldRatio * 0.95f));
-				if (idx > 0) {
-					googleMap.addPolyline(new PolylineOptions().add(
-							new LatLng(points.get(idx - 1).latitude, points
-									.get(idx - 1).longitude),
-							new LatLng(record.latitude, record.longitude))
-							.color(Color.rgb(100, 40, 38)));
-				}
-				/*
-				 * googleMap.addCircle( new CircleOptions() .center(new
-				 * LatLng(record.latitude, record.longitude)) .radius(100)
-				 * .strokeColor(Color.RED) .fillColor(Color.rgb(120, 120,
-				 * 120)));
-				 */
-			}
-			if (move) {
-				if (!isFirst && points.size() > 1) {
-					LatLngBounds.Builder builder = new LatLngBounds.Builder();
-					for (int idx = 0; idx < points.size(); idx++) {
-						LocationLogRecord r = points.get(idx);
-						builder.include(new LatLng(r.latitude, r.longitude));
-					}
-					LatLngBounds bnd = builder.build();
-
-					try {
-						CameraUpdate update = CameraUpdateFactory
-								.newLatLngBounds(bnd, 100);
-						googleMap.animateCamera(update);
-					} catch (IllegalStateException e) {
-						googleMap.animateCamera(CameraUpdateFactory
-								.newLatLng(new LatLng(points.get(0).latitude,
-										points.get(0).longitude)));
-					}
-				} else {
-					googleMap.animateCamera(CameraUpdateFactory
-							.newLatLng(new LatLng(points.get(0).latitude,
-									points.get(0).longitude)));
-					isFirst = false;
-				}
-			}
-		}
-
-		public void invalidate() {
-			googleMap.clear();
-		}
-	}
 
 	private static SimpleDateFormat dateFormat = new SimpleDateFormat(
 			"HH:mm:ss", Locale.getDefault());
 
-	public static final int N_INTERVALS = 60;
-
-	private static Calendar delCalender(Calendar calender, Interval itv) {
-		calender = (Calendar) calender.clone();
-		switch (itv) {
-		case OneDay:
-			calender.add(Calendar.MINUTE, -1440 / N_INTERVALS);
-			break;
-		case ThreeHour:
-			calender.add(Calendar.MINUTE, -180 / N_INTERVALS);
-			break;
-		case ThirtyMin:
-			// DEBUG
-			calender.add(Calendar.SECOND, -180 / N_INTERVALS);
-			break;
-		}
-		return calender;
-	}
-
-	private static Interval progressToInterval(int progress) {
-		switch (progress) {
-		case 0:
-			return Interval.OneDay;
-		case 1:
-			return Interval.ThreeHour;
-		case 2:
-			return Interval.ThirtyMin;
-		}
-		return null;
-	}
-	Interval curInterval = Interval.ThirtyMin;
+	
 
 	private GoogleMap googleMap;
 	private Handler handler;
-
 	private LocationTracer lt;
 
-	MapCtrl mapCtrl = new MapCtrl();
+	
 	private Handler mHandler;
-	private SeekBar resolutionSeekBar;
-	TextView tv;
+	private TextView tv;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -176,6 +72,7 @@ public class LocationActivity extends Activity {
 		String output = "";
 		tv.setText(output);
 		tv.setMovementMethod(new ScrollingMovementMethod());
+		
 		Button mapBtn = (Button) findViewById(R.id.map_btn);
 		mapBtn.setOnClickListener(new OnClickListener() {
 			@Override

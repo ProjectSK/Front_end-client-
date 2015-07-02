@@ -1,5 +1,4 @@
 package com.d.api;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -13,10 +12,16 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class LocationTracer {
 	private Context context;
-	LocalDB ldb;
+	private LocalDB ldb;
 	public LocationTracer(Context context){
 		this.context = context;
 	}
+	/**
+	 * 하룻동안 수집된 기록을 상한 만큼 불러오는 method.
+	 * 저장된 것의 최신순으로 불려온다.
+	 * @param limit DB에서 불러올 Record의 상한
+	 * @return DB에서 불러온 a list of  Records.
+	 */
 	public List<LocationLogRecord> getRecords(int limit){
 		List<LocationLogRecord> records;
 		ldb = new LocalDB(context, LocationLogRecord.TABLE);
@@ -44,7 +49,14 @@ public class LocationTracer {
 		  return d; // returns the distance in meter
 	}
 	
-	public List<LocationLogRecord> getUsableRecords(int limit){
+	
+	/**
+	 * 오차거리내의 기록을 같은 위치로 처리하여 유효한 Records를 골라내는 method
+	 * @param limit DB에서 불러올 Record의 상한
+	 * @param errorDistance 오차거리
+	 * @return
+	 */
+	public List<LocationLogRecord> getUsableRecords(int limit, int errorDistance){
 		List<LocationLogRecord> records;
 		List<LocationLogRecord> usableRecords = new ArrayList<LocationLogRecord>();
 		ldb = new LocalDB(context, LocationLogRecord.TABLE);
@@ -59,7 +71,7 @@ public class LocationTracer {
 					LocationLogRecord r = records.get(i);
 					LocationLogRecord r2 = usableRecords.get(usableRecords.size()-1);
 					
-					if(getDistance(r, r2) > 30){
+					if(getDistance(r, r2) > errorDistance){
 						usableRecords.add(r);
 					}
 					

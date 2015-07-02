@@ -1,37 +1,24 @@
 package com.d.activity;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
-
 import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.SeekBar;
-import android.widget.SeekBar.OnSeekBarChangeListener;
-import android.widget.TextView;
-
 import com.d.api.LocationTracer;
 import com.d.localdb.LocationLogRecord;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import android.util.Log;
+import com.google.android.gms.maps.OnMapReadyCallback;
+
 public class googleMapActivity extends Activity implements OnMapReadyCallback {
 	
-	LocationTracer lt;
+	private LocationTracer lt;
 
 
 	@Override
@@ -51,7 +38,7 @@ public class googleMapActivity extends Activity implements OnMapReadyCallback {
 		LatLng lat = null;
 		LatLng prev = null;
 		
-		List<LocationLogRecord> records = lt.getUsableRecords(20000);
+		List<LocationLogRecord> records = lt.getUsableRecords(20000,30);
 		
 		 map.setMyLocationEnabled(true);
 		 

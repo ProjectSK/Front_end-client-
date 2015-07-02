@@ -14,6 +14,7 @@ import java.util.Locale;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.JavascriptInterface;
@@ -28,12 +29,17 @@ import com.google.gson.Gson;
 
 public class AppUsageActivity extends Activity {
 
-	public static class GraphRow {
+
+	private static class GraphRow {
 		public Long elapsedTime;
 		public String name;
 		public String startTime;
 	}
 
+	/**
+	 * 자바스크립트에서 그래프를 그릴 때 참조할 Record들과 y축의 이름을 전달하는 Container 
+	 * @author Jun
+	 */
 	public static class Information {
 		ArrayList<GraphRow> data = new ArrayList<GraphRow>();
 		public String yaxisDesc;
@@ -43,7 +49,7 @@ public class AppUsageActivity extends Activity {
 		}
 	}
 
-	public class JSInterface {
+	private class JSInterface {
 		Information info;
 
 		public JSInterface() {
@@ -56,7 +62,7 @@ public class AppUsageActivity extends Activity {
 		}
 	}
 
-	public static String yaxisName;
+	private static String yaxisName;
 	private AppUsage au;
 	protected SimpleDateFormat dateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd HH:mm:ss", Locale.getDefault());
@@ -64,24 +70,10 @@ public class AppUsageActivity extends Activity {
 	private TextView tv;
 	protected WebView webview;
 
-	public String getAssetAsString(String path) throws IOException {
-		StringBuilder buf = new StringBuilder();
-		InputStream json;
-		json = getAssets().open(path);
-		BufferedReader in = null;
-		try {
-			in = new BufferedReader(new InputStreamReader(json, "UTF-8"));
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		String str;
-		while ((str = in.readLine()) != null) {
-			buf.append(str);
-		}
-		in.close();
-		return buf.toString();
-	}
-
+	/**
+	 * Records와 Y축의 이름을 Information class에 저장하여 넘겨주는 method
+	 * @return the list of Information classes
+	 */
 	protected Information getInformation() {
 		Information info = new Information();
 		Calendar cal = Calendar.getInstance();
@@ -131,17 +123,19 @@ public class AppUsageActivity extends Activity {
 		webview.getSettings().setLoadWithOverviewMode(true);
 		webview.addJavascriptInterface(new JSInterface(), "Android");
 
+		tv.setMovementMethod(ScrollingMovementMethod.getInstance());
+
 		handler.post(new Runnable() {
 
 			@Override
 			public void run() {
-				List<AppUsage.Resource> stats = au.getStaticInfos();
+				List<AppUsage.StatisticalInfo> stats = au.getStatisticalInfos();
 				List<AppUsageRecord> records = au.getRecords(100);
 
 				String output = "";
 
 				output += "Package Name, Overall Time(s), Number of Execution\n";
-				for (AppUsage.Resource res : stats) {
+				for (AppUsage.StatisticalInfo res : stats) {
 					output += res.PackageName + ", " + res.overallTime + ", "
 							+ res.numberOfExecution + "\n";
 				}

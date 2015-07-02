@@ -41,7 +41,7 @@ public class MainActivity extends Activity {
 		}
 	}
 
-	Button batteryControllerBotton, appUsageActivityBotton, locbtn, stopbtn,
+	private Button batteryControllerBotton, appUsageActivityBotton, locbtn, stopbtn,
 			membtn, cpubtn, databtn;
 
 	@Override
@@ -152,13 +152,17 @@ public class MainActivity extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
 
-	void permission_check() {
+	/**
+	 * to check ACTION_USAGE_ACCESS_SETTINGS is turned on.
+	 */
+	private void permission_check() {
 		Context context = getBaseContext();
 		AppOpsManager appOps = (AppOpsManager) context
 				.getSystemService(Context.APP_OPS_SERVICE);
 		boolean granted = appOps.checkOpNoThrow("android:get_usage_stats",
 				android.os.Process.myUid(), context.getPackageName()) == AppOpsManager.MODE_ALLOWED;
 		Log.d("permission_check", "android:get_usage_stats() : " + granted);
+
 		if(!granted){
 			Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
 			startActivity(intent);
